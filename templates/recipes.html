@@ -4,5 +4,41 @@
 
 {% block content %}
 <h1>My Recipes</h1>
-<p>This is the My Recipes screen. Content coming soon.</p>
+
+<!-- search submits as GET so the query shows in the url -->
+<form action="/recipes" method="GET" class="search-form">
+    <input
+        type="text"
+        name="q"
+        class="search-input"
+        placeholder="search for a recipe..."
+        value="{{ search_query }}"
+        autofocus
+    >
+    <button type="submit" class="btn-search">Search</button>
+</form>
+
+{% if error_message %}
+    <p class="search-error">{{ error_message }}</p>
+{% endif %}
+
+{% if results %}
+    <p class="results-count">{{ results | length }} result(s) for "{{ search_query }}"</p>
+
+    <div class="recipe-grid">
+        {% for meal in results %}
+        <a href="/recipe/{{ meal.idMeal }}" class="recipe-card">
+            <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="recipe-card-img">
+            <div class="recipe-card-body">
+                <h3 class="recipe-card-title">{{ meal.strMeal }}</h3>
+                <p class="recipe-card-meta">{{ meal.strCategory }} · {{ meal.strArea }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+{% elif not search_query %}
+    <p class="search-prompt">search for a recipe above to get started</p>
+{% endif %}
+
 {% endblock %}
