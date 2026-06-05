@@ -1,9 +1,34 @@
 from flask import Flask, render_template
+from models import db
+
+# ============================================================================
+# APPLICATION CONFIGURATION
+# ============================================================================
 
 # Create the Flask application instance.
 # __name__ tells Flask where to look for templates/ and static/ folders.
 app = Flask(__name__)
 
+# Configures the SQLite database location
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pantry.db"
+
+# Disable modification tracking for better performance
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# ============================================================================
+# DATABASE INITIALIZATION
+# ============================================================================
+
+# Connects SQLAlchemy to the Flask application instance
+db.init_app(app)
+
+# Create database tables if they do not exist
+with app.app_context():
+    db.create_all()
+
+# ============================================================================
+# ROUTES
+# ============================================================================
 
 # Each route below maps a URL to a function that returns a page.
 # render_template() finds the named file in templates/ and renders it,
@@ -48,6 +73,9 @@ def shopping():
 def orders():
     return render_template("orders.html", active_page="orders")
 
+# ============================================================================
+# MAIN
+# ============================================================================
 
 if __name__ == "__main__":
     # debug=True auto-reloads the server when you save a file
