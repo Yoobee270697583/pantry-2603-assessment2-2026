@@ -1,4 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import InputRequired, Length, ValidationError
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 # Create the Flask application instance.
 # __name__ tells Flask where to look for templates/ and static/ folders.
@@ -10,8 +17,16 @@ app = Flask(__name__)
 # passing in any variables we want available inside the Jinja2 template.
 
 @app.route("/")
-def home():
-    return render_template("home.html", active_page="home")
+def login():
+    return render_template("login.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/kitchen")
+def kitchen():
+    return render_template("kitchen.html", active_page="kitchen")
 
 
 @app.route("/pantry")

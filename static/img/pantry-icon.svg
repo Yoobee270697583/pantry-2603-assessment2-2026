@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 168 145.67">
+  <!-- Generator: Adobe Illustrator 30.5.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 3)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #e1f5ee;
+      }
+
+      .st0, .st1, .st2 {
+        stroke: #1d9e75;
+        stroke-width: 2.5px;
+      }
+
+      .st3 {
+        fill: #3b6d11;
+      }
+
+      .st4 {
+        fill: #639922;
+      }
+
+      .st5 {
+        fill: #0f6e56;
+      }
+
+      .st6 {
+        fill: #1d9e75;
+      }
+
+      .st1 {
+        fill: #9fe1cb;
+      }
+
+      .st2 {
+        fill: #5dcaa5;
+      }
+    </style>
+  </defs>
+  <ellipse class="st3" cx="88" cy="21.67" rx="14" ry="22" transform="translate(-2.1 31.4) rotate(-20)"/>
+  <ellipse class="st4" cx="106" cy="16.67" rx="17" ry="11" transform="translate(62.46 114.74) rotate(-75)"/>
+  <rect class="st1" x="8" y="65.67" width="44" height="64" rx="10" ry="10"/>
+  <rect class="st6" x="14" y="51.67" width="32" height="16" rx="4" ry="4"/>
+  <rect class="st2" x="66" y="49.67" width="38" height="80" rx="9" ry="9"/>
+  <rect class="st5" x="73" y="35.67" width="24" height="16" rx="4" ry="4"/>
+  <rect class="st0" x="117" y="73.67" width="46" height="56" rx="8" ry="8"/>
+  <rect class="st6" x="124" y="59.67" width="32" height="16" rx="4" ry="4"/>
+  <rect class="st6" y="129.67" width="168" height="16" rx="6" ry="6"/>
+</svg>

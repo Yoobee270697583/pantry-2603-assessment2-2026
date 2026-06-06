@@ -1,0 +1,26 @@
+<svg width="400" height="175" viewBox="0 0 400 175" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Pantry logo</title>
+  <desc>Pantry app logo — shelf with jars and leaf accent alongside wordmark</desc>
+
+  <!-- leaves (pushed down so tops don't clip) -->
+  <ellipse cx="80" cy="42" rx="13" ry="22" fill="#3B6D11" transform="rotate(-20 80 42)"/>
+  <ellipse cx="96" cy="38" rx="10" ry="17" fill="#639922" transform="rotate(15 96 38)"/>
+
+  <!-- jar left -->
+  <rect x="12" y="78" width="38" height="54" rx="9" fill="#9FE1CB" stroke="#1D9E75" stroke-width="2.5"/>
+  <rect x="18" y="66" width="26" height="14" rx="4" fill="#1D9E75"/>
+
+  <!-- bottle middle -->
+  <rect x="60" y="62" width="32" height="70" rx="8" fill="#5DCAA5" stroke="#1D9E75" stroke-width="2.5"/>
+  <rect x="66" y="50" width="20" height="14" rx="4" fill="#0F6E56"/>
+
+  <!-- can right -->
+  <rect x="103" y="82" width="42" height="50" rx="6" fill="#E1F5EE" stroke="#1D9E75" stroke-width="2.5"/>
+  <rect x="110" y="70" width="28" height="14" rx="4" fill="#1D9E75"/>
+
+  <!-- shelf board -->
+  <rect x="2" y="132" width="148" height="14" rx="5" fill="#1D9E75"/>
+
+  <!-- wordmark — y=120 baseline, descenders clear 175 height -->
+  <text x="172" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="58" font-weight="700" fill="#1a1a1a">pantry</text>
+</svg>

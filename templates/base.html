@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Pantry{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-style.css') }}">
 </head>
 <body>
 
     <!-- Desktop Style Left Bar Main Navigation (tablet viewport & up) -->
     <nav class="left-nav">
         <header class="left-nav-logo">
-            <a href="{{ url_for('home') }}">Pantry</a>
+            <a href="{{ url_for('kitchen') }}">Pantry</a>
         </header>
 
         <ul class="left-nav-links">
-            <li><a href="{{ url_for('home') }}"        class="{{ 'is-active' if active_page == 'home' }}">Home</a></li>
+            <li><a href="{{ url_for('kitchen') }}"        class="{{ 'is-active' if active_page == 'kitchen' }}">My Kitchen</a></li>
             <li><a href="{{ url_for('pantry') }}"      class="{{ 'is-active' if active_page == 'pantry' }}">My Pantry</a></li>
             <li><a href="{{ url_for('recipes') }}"     class="{{ 'is-active' if active_page == 'recipes' }}">My Recipes</a></li>
             <li><a href="{{ url_for('suggestions') }}" class="{{ 'is-active' if active_page == 'suggestions' }}">Suggested Recipes</a></li>
@@ -41,7 +41,7 @@
 
     <!-- Mobile Style, Bottom Bar Main Navigation (mobile only) -->
     <nav class="bottom-nav">
-        <a href="{{ url_for('home') }}"     class="{{ 'is-active' if active_page == 'home' }}">Home</a>
+        <a href="{{ url_for('kitchen') }}"     class="{{ 'is-active' if active_page == 'kitchen' }}">Home</a>
         <a href="{{ url_for('pantry') }}"   class="{{ 'is-active' if active_page == 'pantry' }}">Pantry</a>
         <a href="{{ url_for('recipes') }}"  class="{{ 'is-active' if active_page in ['recipes', 'suggestions'] }}">Recipes</a>
         <a href="{{ url_for('planned') }}"  class="{{ 'is-active' if active_page in ['planned', 'cooked'] }}">Meals</a>
