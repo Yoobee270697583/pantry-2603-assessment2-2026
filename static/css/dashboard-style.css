@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color: #1f2421;
     background: #f7f8f7;
     line-height: 1.5;
@@ -33,7 +33,7 @@ a {
     border-right: 1px solid #e3e6e3;
     display: flex;
     flex-direction: column;
-    padding: 20px 0;
+    padding-top: 20px;
 }
 
 .left-nav-logo {
@@ -70,15 +70,34 @@ a {
     border-left-color: #2f7d57;
 }
 
-/* Account block pinned at the bottom of the left nav.
-   Just the account icon + name for now; the Settings / Log out
-   menu will be added here later. */
+
+/* Account block pinned at the bottom of the left nav */
+
 .left-nav-account {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 24px 4px;
+    /* padding: 16px 24px 4px; */
     border-top: 1px solid #e3e6e3;
+    position: relative;
+}
+
+
+.account-trigger {
+    /* resets the default button tag styles to inherit the the layout styles of the account section, keeping a nice layout */
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #fff;
+    border: none;
+    border-radius: 0.4rem;;
+    padding: 1rem;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
 }
 
 .account-icon {
@@ -96,6 +115,39 @@ a {
     font-size: 0.95rem;
     font-weight: 600;
 }
+
+.account-menu {
+    position: absolute;
+    bottom: 5rem;
+    left: 1rem;
+    right: 1rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.account-menu a {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.4rem;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.account-trigger:hover, .account-menu a:hover {
+    background: #f0f4f1;
+}
+
+.account-menu.hidden {
+    display: none;
+}
+
+
 
 /* -- Main content -- */
 .content {
