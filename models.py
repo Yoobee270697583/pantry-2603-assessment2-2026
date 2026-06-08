@@ -91,6 +91,37 @@ class PantryItem(db.Model):
         nullable=False
     )
 
+class RecipeIngredient(db.Model):
+    """
+    Represents ingredients required for recipe.
+    Will use to comapare ingredients required to the ingredients
+    that the user already owns in their pantry i.e. pantry_items
+    """
+
+    # Primary Key
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    
+    # Ingredient Name
+    name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    # Ingredient amount from TheMealDB
+    amount = db.Column(
+        db.String(100)
+    )
+
+    # Recipe this ingredient belongs to
+    recipe_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recipe.id"),
+        nullable=False
+    )
+
 class Recipe(db.Model):
     """
     Represents stored recipes saved by the user.
