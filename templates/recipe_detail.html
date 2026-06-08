@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ meal.strMeal }} — Pantry{% endblock %}
+
+{% block content %}
+
+<a href="/recipes" class="back-link">← back to recipes</a>
+
+<div class="recipe-header">
+    <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="recipe-hero-img">
+    <div class="recipe-header-info">
+        <h1>{{ meal.strMeal }}</h1>
+        <p class="recipe-meta">
+            <span class="tag">{{ meal.strCategory }}</span>
+            <span class="tag">{{ meal.strArea }}</span>
+        </p>
+        <!-- only show if the api returned a youtube link -->
+        {% if meal.strYoutube %}
+            <a href="{{ meal.strYoutube }}" target="_blank" class="btn-youtube">▶ watch on youtube</a>
+        {% endif %}
+    </div>
+</div>
+
+<section class="recipe-section">
+    <h2>Ingredients</h2>
+    <ul class="ingredients-list">
+        {% for item in ingredients %}
+            <li class="ingredient-item">
+                <span class="ingredient-amount">{{ item.amount }}</span>
+                <span class="ingredient-name">{{ item.name }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section class="recipe-section">
+    <h2>Instructions</h2>
+    <!-- pre-line keeps the line breaks from the api -->
+    <div class="instructions">
+        {{ meal.strInstructions }}
+    </div>
+</section>
+
+{% endblock %}

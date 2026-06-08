@@ -1,11 +1,14 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from models import db
+from api_helper import search_recipes, get_recipe_by_id, get_ingredients
 
 # ============================================================================
 # APPLICATION CONFIGURATION
 # ============================================================================
 # DB Debug
 database_debug = True
+
+
 
 
 # Create the Flask application instance.
@@ -55,7 +58,43 @@ def pantry():
 
 @app.route("/recipes")
 def recipes():
-    return render_template("recipes.html", active_page="recipes")
+    # get the search query from the url e.g. /recipes?q=pasta
+    search_query = request.args.get("q", "").strip()
+
+    results = []
+    error_message = ""
+
+    if search_query:
+        results = search_recipes(search_query)
+
+        if len(results) == 0:
+            error_message = f"no recipes found for '{search_query}', try something else"
+
+    return render_template(
+        "recipes.html",
+        active_page="recipes",
+        results=results,
+        search_query=search_query,
+        error_message=error_message
+    )
+
+
+@app.route("/recipe/<meal_id>")
+def recipe_detail(meal_id):
+    meal = get_recipe_by_id(meal_id)
+
+    # show not found page if the recipe doesnt exist
+    if meal is None:
+        return render_template("not_found.html", active_page="recipes"), 404
+
+    ingredients = get_ingredients(meal)
+
+    return render_template(
+        "recipe_detail.html",
+        active_page="recipes",
+        meal=meal,
+        ingredients=ingredients
+    )
 
 
 @app.route("/suggestions")
