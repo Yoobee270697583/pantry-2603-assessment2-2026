@@ -76,3 +76,56 @@ class PantryItem(db.Model):
         db.ForeignKey("user.id"), 
         nullable=False
     )
+
+class Recipe(db.Model):
+    """
+    Represents stored recipes saved by the user.
+    Recipes may come from TheMealDB or be manually created
+    """
+    # Primary DB ID Key
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # External ID from mealdb if it exists
+    mealdb_id = db.Column(db.String(50))
+
+    # Recipe name
+    name = db.Column(db.String(150), nullable=False)
+
+    # Recipe Category
+    category = db.Column(db.String(100))
+
+    # Recipe Origin Country 
+    area = db.Column(db.String(100))
+
+    # Recipe Instructions
+    instructions = db.Column(db.Text)
+
+    # Recipe Thumbnail
+    image_url = db.Column(db.String(500))
+
+    # Recipe youtube link 
+    youtube_url = db.Column(db.String(500))
+
+    # Recipe source, will be either TheMealDB or Custom
+    source = db.Column(
+        db.String(50),
+        default="TheMealDB"
+    )
+
+    # User that saved the recipe
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    # Ingredients required for this recipe
+    ingredients = db.relationship(
+        "RecipeIngredient",
+        backref="recipe",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
