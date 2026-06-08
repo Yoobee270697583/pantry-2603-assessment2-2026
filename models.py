@@ -35,7 +35,7 @@ class User(UserMixin, db.Model):
 
     # Hashed password
     password_hash = db.Column(
-        db.String(225), 
+        db.String(255), 
         nullable=False
     )
 
