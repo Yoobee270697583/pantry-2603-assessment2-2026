@@ -166,6 +166,12 @@ class Recipe(db.Model):
         db.ForeignKey("user.id"),
         nullable=False
     )
+    
+    # Date recipe was saved
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
 
     # Ingredients required for this recipe
     ingredients = db.relationship(
