@@ -180,3 +180,65 @@ class Recipe(db.Model):
         lazy=True,
         cascade="all, delete-orphan"
     )
+
+class MealPlan(db.Model):
+    """
+    Stores recipes planned for a specific date
+    """
+
+    # Primary key
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # Date meal is planned for
+    planned_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    # User that created the plan
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    # Recipe assigned to that date
+    recipe_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recipe.id"),
+        nullable=False
+    )
+
+class CookedMeal(db.Model):
+    """
+    Stores meals that have been cooked.
+    """
+
+    # Primary Key
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # Date meal was cooked
+    cooked_date = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    # User who cooked the meal
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    # Recipe that was cooked
+    recipe_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recipe.id"),
+        nullable=False
+    )
