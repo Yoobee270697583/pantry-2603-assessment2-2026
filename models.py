@@ -35,8 +35,22 @@ class User(UserMixin, db.Model):
 
     # Hashed password
     password_hash = db.Column(
-        db.String(225), 
+        db.String(255), 
         nullable=False
+    )
+
+    # Pantry items owned by this user
+    pantry_items = db.relationship(
+        "PantryItem",
+        backref="owner",
+        lazy=True
+    )
+
+    # Recipes saved by this user
+    recipes = db.relationship(
+        "Recipe",
+        backref="owner",
+        lazy=True
     )
 
 class PantryItem(db.Model):
@@ -75,4 +89,94 @@ class PantryItem(db.Model):
         db.Integer, 
         db.ForeignKey("user.id"), 
         nullable=False
+    )
+
+class RecipeIngredient(db.Model):
+    """
+    Represents ingredients required for recipe.
+    Will use to comapare ingredients required to the ingredients
+    that the user already owns in their pantry i.e. pantry_items
+    """
+
+    # Primary Key
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    
+    # Ingredient Name
+    name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    # Ingredient amount from TheMealDB
+    amount = db.Column(
+        db.String(100)
+    )
+
+    # Recipe this ingredient belongs to
+    recipe_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recipe.id"),
+        nullable=False
+    )
+
+class Recipe(db.Model):
+    """
+    Represents stored recipes saved by the user.
+    Recipes may come from TheMealDB or be manually created
+    """
+    # Primary DB ID Key
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # External ID from mealdb if it exists
+    mealdb_id = db.Column(db.String(50))
+
+    # Recipe name
+    name = db.Column(db.String(150), nullable=False)
+
+    # Recipe Category
+    category = db.Column(db.String(100))
+
+    # Recipe Origin Country 
+    area = db.Column(db.String(100))
+
+    # Recipe Instructions
+    instructions = db.Column(db.Text)
+
+    # Recipe Thumbnail
+    image_url = db.Column(db.String(500))
+
+    # Recipe youtube link 
+    youtube_url = db.Column(db.String(500))
+
+    # Recipe source, will be either TheMealDB or Custom
+    source = db.Column(
+        db.String(50),
+        default="TheMealDB"
+    )
+
+    # User that saved the recipe
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+    
+    # Date recipe was saved
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    # Ingredients required for this recipe
+    ingredients = db.relationship(
+        "RecipeIngredient",
+        backref="recipe",
+        lazy=True,
+        cascade="all, delete-orphan"
     )
