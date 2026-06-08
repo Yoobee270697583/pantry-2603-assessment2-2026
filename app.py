@@ -4,6 +4,9 @@ from models import db
 # ============================================================================
 # APPLICATION CONFIGURATION
 # ============================================================================
+# DB Debug
+database_debug = True
+
 
 # Create the Flask application instance.
 # __name__ tells Flask where to look for templates/ and static/ folders.
@@ -25,6 +28,12 @@ db.init_app(app)
 # Create database tables if they do not exist
 with app.app_context():
     db.create_all()
+
+    if database_debug:
+        print("\n=== DATABASE TABLES ===")
+        for table in db.metadata.tables.keys():
+            print(f"✅ {table}")
+        print("=======================\n")
 
 # ============================================================================
 # ROUTES
