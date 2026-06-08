@@ -26,9 +26,17 @@
         </ul>
 
         <!-- Account area. Settings / Log out menu to be added later. -->
+<!-- Account area with reveal menu -->
         <footer class="left-nav-account">
-            <span class="account-icon">A</span>
-            <span class="account-name">Allan</span>
+            <button type="button" class="account-trigger" id="accountTrigger">
+                <span class="account-icon">{{ current_user.first_name[0] | upper }}</span>
+                <span class="account-name">{{ current_user.first_name }}</span>
+            </button>
+
+            <div class="account-menu hidden" id="accountMenu">
+                <a href="#">Settings</a>
+                <a href="{{ url_for('logout') }}">Log out</a>
+            </div>
         </footer>
     </nav>
 
@@ -47,6 +55,23 @@
         <a href="{{ url_for('planned') }}"  class="{{ 'is-active' if active_page in ['planned', 'cooked'] }}">Meals</a>
         <a href="{{ url_for('shopping') }}" class="{{ 'is-active' if active_page in ['shopping', 'orders'] }}">Shopping</a>
     </nav>
+
+    <script>
+        const accountTrigger = document.getElementById('accountTrigger');
+        const accountMenu = document.getElementById('accountMenu');
+    
+        accountTrigger.addEventListener('click', function() {
+            accountMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function(event) {
+            const clickedInside = accountTrigger.contains(event.target) || accountMenu.contains(event.target);
+
+            if (!clickedInside) {
+                accountMenu.classList.add('hidden');
+            }
+        });
+    </script>
 
 </body>
 </html>

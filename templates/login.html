@@ -8,23 +8,33 @@
 </head>
 <body>
     
-    <main class="login-container">
-        <section class="login-card">
+    <main class="login-register-container">
+        <section class="login-register-card">
             <img src="{{ url_for('static', filename='img/pantry-icon.svg') }}" alt="Pantry logo">
             <h1>Pantry</h1>
             <p class="tagline">Use More. Waste Less.</p>
-            <form action="{{ url_for('kitchen') }}" method="POST">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="flash-{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="POST">
+                {{ form.hidden_tag() }}
                 <div class="field">
-                    <label for="username">Email:</label>
-                    <input type="email" name="username" placeholder="youremail@example.com" required>
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" placeholder="youremail@example.com" required>
                 </div>
                 <div class="field">
                     <label for="password">Password:</label>
                     <input type="password" name="password" placeholder="Enter your password" required>
                 </div>
-                <button class="login-btn" type="submit">Log In</button>
+                <button class="login-register-btn" type="submit">Log In</button>
             </form>
-            <p class="register-link">Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a>.</p>
+            <p class="login-register-link">Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a>.</p>
         </section>
     </main>
     

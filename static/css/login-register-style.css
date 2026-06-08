@@ -1,3 +1,4 @@
+
 /* ---------- Reset & base ---------- */
 * {
     box-sizing: border-box;
@@ -19,7 +20,7 @@ a {
 
 /* ===== PAGE ===== */
 
-main.login-container {
+main.login-register-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -29,7 +30,7 @@ main.login-container {
 }
 
 /* ===== CARD ===== */
-.login-card {
+.login-register-card {
     background: #fff;
     border-radius: 1.5rem;
     box-shadow: 0 4px 24px rgba(0,0,0,0.06);
@@ -40,12 +41,8 @@ main.login-container {
     flex-direction: column;
 }
 
-    /* align-items: center;
-    justify-content: center;
-    gap: 1rem; */
-
 /* ===== LOGO AREA ===== */
-.login-card img {
+.login-register-card img {
     display: block;
     margin: 0 auto;
     width: 200px;
@@ -53,7 +50,7 @@ main.login-container {
 }
 
 /* ===== HEADING ===== */
-.login-card h1 {
+.login-register-card h1 {
     text-align: center;
     font-size: 1.75rem;
     font-weight: 700;
@@ -61,7 +58,7 @@ main.login-container {
     margin-bottom: 0.4rem;
 }
 
-.login-card .tagline {
+.tagline {
     text-align: center;
     font-size: 0.9rem;
     font-weight: 500;
@@ -100,7 +97,7 @@ main.login-container {
 }
 
 /* ===== BUTTON ===== */
-.login-btn {
+.login-register-btn {
     width: 100%;
     padding: 0.8rem;
     color: white;
@@ -116,23 +113,23 @@ main.login-container {
     transition: background-color 0.2s;
 }
 
-.login-btn:hover {
+.login-register-btn:hover {
     background-color: #1d9e75;
 }
 
 /* ===== FOOTER LINK ===== */
-.login-card .register-link {
+.login-register-link {
     text-align: center;
     font-size: 0.9rem;
     color: #8a8a80;
 }
 
-.login-card .register-link a {
+.login-register-link a {
     color: #0f6e56;
     font-weight: 600;
     text-decoration: none;
 }
 
-.login-card .register-link a:hover {
+.login-register-link a:hover {
     text-decoration: underline;
 }

@@ -8,6 +8,7 @@ __pycache__/
 # Database (each person runs their own locally)
 *.db
 *.sqlite
+instance/
 
 # OS clutter
 .DS_Store
