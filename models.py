@@ -39,6 +39,20 @@ class User(UserMixin, db.Model):
         nullable=False
     )
 
+    # Pantry items owned by this user
+    pantry_items = db.relationship(
+        "PantryItem",
+        backref="owner",
+        lazy=True
+    )
+
+    # Recipes saved by this user
+    recipes = db.relationship(
+        "Recipe",
+        backref="owner",
+        lazy=True
+    )
+
 class PantryItem(db.Model):
     """
     Represents an ingredient stored in a user's pantry.
