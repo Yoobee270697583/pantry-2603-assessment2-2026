@@ -5,4 +5,15 @@
 {% block content %}
 <h1>Planned Meals</h1>
 <p>This is the Planned Meals screen. Content coming soon.</p>
+
+### "Planned Meals"
+- Loose ordered list (not calendar-locked) of meals the user intends to cook soon
+- Add recipes from library, suggestions, or custom recipes
+- Drag-to-reorder for shifting priorities (e.g. expiring ingredients)
+- Feeds directly into the dynamic shopping list
+- **Per-meal card** — tapping/clicking the meal card always opens the full recipe spec
+- **Two primary buttons per meal:**
+  - **Mark as cooked** — allocates the meal as cooked; dynamically updates Pantry inventory by removing the ingredients used, and moves the meal into Cooked Meals
+  - **Delete** — removes the meal from the planned-to-cook queue (no pantry effect)
+
 {% endblock %}
