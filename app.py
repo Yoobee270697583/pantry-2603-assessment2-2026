@@ -119,6 +119,32 @@ def pantry():
         pantry_items=pantry_items
     )
 
+@app.route("/pantry/add", methods=["GET", "POST"])
+@login_required
+def add_pantry_item():
+    form = AddPantryItemForm()
+
+    if form.validate_on_submit():
+        item = PantryItem(
+            name = form.name.data,
+            quantity = form.quantity.data,
+            unit = form.unit.data,
+            expiry_date = form.expiry_date.data,
+            user_id = current_user.id
+        )
+
+        db.session.add(item)
+        db.session.commit()
+
+        flash("Pantry Item added successfully.")
+
+        return redirect(url_for("pantry"))
+    
+    return render_template(
+        "add_pantry_item.html",
+        form=form,
+        active_page="pantry"
+    )
 
 @app.route("/recipes")
 @login_required
