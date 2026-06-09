@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo
 from models import User
+
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
 class RegisterForm(FlaskForm):
     first_name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
