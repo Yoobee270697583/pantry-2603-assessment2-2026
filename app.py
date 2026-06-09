@@ -113,6 +113,9 @@ def pantry():
         user_id=current_user.id
     ).all()
 
+    print("Current user:", current_user.id)
+    print("Pantry items:", pantry_items)
+
     return render_template(
         "pantry.html", 
         active_page="pantry",
@@ -125,6 +128,8 @@ def add_pantry_item():
     form = AddPantryItemForm()
 
     if form.validate_on_submit():
+        print("FORM VALID")
+
         item = PantryItem(
             name = form.name.data,
             quantity = form.quantity.data,
@@ -136,9 +141,10 @@ def add_pantry_item():
         db.session.add(item)
         db.session.commit()
 
-        flash("Pantry Item added successfully.")
-
+        print("Saved item:", item.name, item.user_id)
         return redirect(url_for("pantry"))
+    
+    print("FORM ERRORS:", form.errors)
     
     return render_template(
         "add_pantry_item.html",

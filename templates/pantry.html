@@ -1,8 +1,16 @@
-{% extends "base.html" %}
-
-{% block title %}My Pantry — Pantry{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}My Pantry — Pantry{% endblock %} {%
+block content %}
 <h1>My Pantry</h1>
-<p>This is the My Pantry screen. Content coming soon.</p>
-{% endblock %}
+<a href="{{ url_for('add_pantry_item') }}"> Add Item </a>
+
+{% if pantry_items %}
+<ul>
+  {% for item in pantry_items %}
+  <li>{{ item.name }} - {{ item.quantity }} {{ item.unit }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+
+<p>Your pantry is empty.</p>
+
+{% endif %} {% endblock %}

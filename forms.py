@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FloatField, DateField
-from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo
+from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional
 from models import User
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
 class RegisterForm(FlaskForm):
@@ -46,6 +46,7 @@ class AddPantryItemForm(FlaskForm):
     # Unit (kg, g, L, mL etc)
     unit = StringField(
         validators=[
+            Optional(),
             Length(max=50)
         ]
     )
@@ -53,8 +54,7 @@ class AddPantryItemForm(FlaskForm):
     # Optional Exp date
     expiry_date = DateField(
         format="%Y-%m-%d",
-        validators=[],
-        default=None
+        validators=[Optional()],
     )
 
     submit = SubmitField("Add Item")

@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block title %} Add Pantry Item {% endblock %} {%
+block content %}
+
+<h1>Add Pantry Item</h1>
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  <div>{{ form.name.label }} {{ form.name() }}</div>
+
+  <br />
+
+  <div>{{ form.quantity.label }} {{ form.quantity() }}</div>
+
+  <br />
+
+  <div>{{ form.unit.label }} {{ form.unit() }}</div>
+
+  <br />
+
+  <div>{{ form.expiry_date.label }} {{ form.expiry_date(type="date") }}</div>
+
+  <br />
+
+  {{ form.submit() }}
+</form>
+
+<br />
+
+<a href="{{ url_for('pantry') }}"> Back to Pantry </a>
+
+{% endblock %}
