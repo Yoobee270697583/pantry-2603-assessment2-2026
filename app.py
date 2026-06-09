@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from models import db, User
+from models import db, User, PantryItem
 from api_helper import search_recipes, get_recipe_by_id, get_ingredients
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, AddPantryItemForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -108,7 +108,16 @@ def kitchen():
 @app.route("/pantry")
 @login_required
 def pantry():
-    return render_template("pantry.html", active_page="pantry")
+    # get all pantry items owned by user
+    pantry_items = PantryItem.query.filter_by(
+        user_id=current_user.id
+    ).all()
+
+    return render_template(
+        "pantry.html", 
+        active_page="pantry",
+        pantry_items=pantry_items
+    )
 
 
 @app.route("/recipes")
