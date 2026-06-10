@@ -38,6 +38,11 @@
                 <div class="field">
                     {{ form.password.label }}
                     {{ form.password(placeholder="Password", required=True) }}
+                    <ul>Passwords must contain:
+                        <li>An uppercase letter</li>
+                        <li>A lowercase letter</li>
+                        <li>A number</li>
+                    </ul>
                     {% for error in form.password.errors %}
                         <span class="error">{{ error }}</span>
                     {% endfor %}

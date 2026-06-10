@@ -6,6 +6,7 @@
 <h1>Cooked Meals</h1> 
 <p>This is the Cooked Meals screen. Content coming soon.</p>
 
+<pre>
 ### "Cooked Meals"
 - Meals marked as cooked move from Planned Meals into a timestamped log here
 - Records: recipe, date cooked
@@ -14,10 +15,14 @@
 - **Per-meal card** — tapping/clicking the meal card always opens the full recipe spec
 - **Buttons per meal:**
   - **Cook again** — adds another instance of the meal back into Planned Meals
-  - **Undo** — for an accidental/mistaken "mark as cooked": removes the cooked-meal entry **and restores the deducted ingredients to the pantry**, effectively reversing the cook (the meal can optionally return to Planned Meals). This is the true "I didn't actually cook this" path
+  - **Undo** — for an accidental/mistaken "mark as cooked": removes the cooked-meal entry **and restores the deducted ingredients to the pantry**, effectively reversing the cook (the meal can optionally return to Planned Meals).
+      This is the true "I didn't actually cook this" path
   - **Delete** — for genuinely-cooked meals the user just wants to remove from their history: removes the log entry **only**, with no effect on pantry inventory
 - Splitting Undo and Delete separates the two distinct intents cleanly (reverse a mistake vs. tidy history), so neither needs to guess the user's meaning
-- **Button layout/hierarchy:** **Cook again** is the primary, always-visible action on the card. **Undo** and **Delete** are tucked into an overflow menu / the expanded card view rather than sitting as exposed buttons — keeps each card uncluttered (important on mobile) and keeps the destructive/reversal actions one deliberate step away
+- **Button layout/hierarchy:** **Cook again** is the primary, always-visible action on the card.
+  **Undo** and **Delete** are tucked into an overflow menu / the expanded card view rather than sitting as exposed buttons 
+    keeps each card uncluttered (important on mobile) and keeps the destructive/reversal actions one deliberate step away
 - **Design consideration:** Delete may still warrant a light confirm step since it's destructive to history, but it no longer has to carry the inventory-restoration ambiguity — that's Undo's job
+</pre>
 
 {% endblock %}
