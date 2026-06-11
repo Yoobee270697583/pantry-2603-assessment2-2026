@@ -1,32 +1,34 @@
-{% extends "base.html" %} {% block title %} Add Pantry Item {% endblock %} {%
-block content %}
+{% extends "base.html" %} {% block content %}
 
-<h1>Add Pantry Item</h1>
+<div class="form-page">
+  <a href="{{ url_for('pantry') }}" class="back-link">← Back to Pantry</a>
 
-<form method="POST">
-  {{ form.hidden_tag() }}
+  <div class="form-card">
+    <h1>Add Pantry Item</h1>
+    <p class="form-subtitle">Track what you already have at home.</p>
 
-  <div>{{ form.name.label }} {{ form.name() }}</div>
+    <form method="POST">
+      {{ form.hidden_tag() }}
 
-  <br />
+      <div class="field">
+        {{ form.name.label }} {{ form.name(placeholder="e.g. Rice") }}
+      </div>
 
-  <div>{{ form.quantity.label }} {{ form.quantity() }}</div>
+      <div class="field">
+        {{ form.quantity.label }} {{ form.quantity(placeholder="e.g. 2") }}
+      </div>
 
-  <br />
+      <div class="field">
+        {{ form.unit.label }} {{ form.unit(placeholder="kg, g, L, mL, cans") }}
+      </div>
 
-  <div>{{ form.unit.label }} {{ form.unit() }}</div>
+      <div class="field">
+        {{ form.expiry_date.label }} {{ form.expiry_date(type="date") }}
+      </div>
 
-  <br />
-
-  <div>{{ form.expiry_date.label }} {{ form.expiry_date(type="date") }}</div>
-
-  <br />
-
-  {{ form.submit() }}
-</form>
-
-<br />
-
-<a href="{{ url_for('pantry') }}"> Back to Pantry </a>
+      {{ form.submit(class="form-btn") }}
+    </form>
+  </div>
+</div>
 
 {% endblock %}

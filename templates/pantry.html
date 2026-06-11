@@ -1,16 +1,41 @@
-{% extends "base.html" %} {% block title %}My Pantry — Pantry{% endblock %} {%
+{% extends "base.html" %} {% block title %} My Pantry — Pantry {% endblock %} {%
 block content %}
-<h1>My Pantry</h1>
-<a href="{{ url_for('add_pantry_item') }}"> Add Item </a>
+
+<div class="pantry-header">
+  <h1>My Pantry</h1>
+
+  <a href="{{ url_for('add_pantry_item') }}" class="btn-add-item">
+    + Add Item
+  </a>
+</div>
 
 {% if pantry_items %}
-<ul>
+
+<div class="pantry-grid">
   {% for item in pantry_items %}
-  <li>{{ item.name }} - {{ item.quantity }} {{ item.unit }}</li>
+
+  <div class="pantry-card">
+    <h3>{{ item.name }}</h3>
+
+    <p class="pantry-quantity">{{ item.quantity }} {{ item.unit }}</p>
+
+    {% if item.expiry_date %}
+    <p class="pantry-expiry">Expires: {{ item.expiry_date }}</p>
+    {% endif %}
+  </div>
+
   {% endfor %}
-</ul>
+</div>
+
 {% else %}
 
-<p>Your pantry is empty.</p>
+<div class="empty-state">
+  <h3>Your pantry is empty</h3>
+  <p>Add some ingredients to get started.</p>
+
+  <a href="{{ url_for('add_pantry_item') }}" class="btn-add-item">
+    Add First Item
+  </a>
+</div>
 
 {% endif %} {% endblock %}
