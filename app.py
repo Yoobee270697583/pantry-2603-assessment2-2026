@@ -86,10 +86,14 @@ def register():
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data)
         new_user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Account created successfully. Please log in.')
-        return redirect(url_for('login'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Account created successfully. Please log in.')
+            return redirect(url_for('login'))
+        except Exception:
+            db.session.rollback()
+            flash('Something went wrong creating your account. Please try again.', 'error')
     
     return render_template("register.html", form=form)
 

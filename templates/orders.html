@@ -5,4 +5,14 @@
 {% block content %}
 <h1>Previous Orders</h1>
 <p>This is the Previous Orders screen. Content coming soon.</p>
+
+<pre>
+### "Previous Orders"
+- An order is generated **only** when the user taps **"Add List To Pantry"** on the Shopping Lists screen — never automatically and with no separate "place order" step
+- That single action: updates Pantry inventory with the list items, clears the shopping list, and logs the order here
+- Each order records: date, items, quantities (and supermarket if relevant)
+- Acts as a historical log of what was "ordered"/restocked
+- Note: previously conceived as fed by supermarket cart integration (now removed); orders are now entirely user-driven via the Add List To Pantry action..
+</pre>
+
 {% endblock %}
