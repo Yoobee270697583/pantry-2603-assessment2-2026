@@ -96,6 +96,16 @@ main.login-register-container {
     border: 2px solid #1d9e75;
 }
 
+.field ul {
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding-left: 2rem;
+}
+
+.error {
+    color: red;
+}
+
 /* ===== BUTTON ===== */
 .login-register-btn {
     width: 100%;

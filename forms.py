@@ -1,13 +1,20 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FloatField, DateField
-from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional
+from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Regexp, Optional
 from models import User
+
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
 class RegisterForm(FlaskForm):
     first_name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
     last_name = StringField(validators=[InputRequired(), Length(min=1, max =150)])
     email = StringField(validators=[InputRequired(), Email(message='Invalid email'), Length(max=150)])
-    password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
+    password = PasswordField(validators=[InputRequired(), Length(min=8, max=256), 
+                                         Regexp(
+                                             r'(?=.*\d)(?=.*[a-z])(?=.*[A-Z])',
+                                         message='Password must contain an uppercase letter, a lowercase letter, and a number'
+                                                )
+                                        ]
+                            )
     confirm_password = PasswordField(validators=[InputRequired(), EqualTo('password', message='Passwords must match')])
     submit = SubmitField('Register')
     
