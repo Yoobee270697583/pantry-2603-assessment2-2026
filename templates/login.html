@@ -1,48 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login-register-style.css') }}">
-    <title>Login - Pantry</title>
-</head>
-<body>
-    
-    <main class="login-register-container">
-        <section class="login-register-card">
-            <img src="{{ url_for('static', filename='img/pantry-icon.svg') }}" alt="Pantry logo">
-            <h1>Pantry</h1>
-            <p class="tagline">Use More. Waste Less.</p>
+{% extends "auth_base.html" %}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <p class="flash-{{ category }}">{{ message }}</p>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+{% block title %}Login - Pantry{% endblock %}
 
-            <form action="{{ url_for('login') }}" method="POST">
-                {{ form.hidden_tag() }}
-                <div class="field">
-                    {{ form.email.label }}
-                    {{ form.email(placeholder="Email Address", required=True) }}
-                    {% for error in form.email.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="field">
-                    {{ form.password.label }}
-                    {{ form.password(placeholder="Password", required=True) }}
-                    {% for error in form.password.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <button class="login-register-btn" type="submit">Log In</button>
-            </form>
-            <p class="login-register-link">Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a>.</p>
-        </section>
-    </main>
-    
-</body>
-</html>
+{% block content %}
+<main class="auth-page">
+    <section class="auth-card">
+        <img src="{{ url_for('static', filename='img/pantry-icon.svg') }}" alt="Pantry logo">
+        <h1>Pantry</h1>
+        <p class="tagline">Use More. Waste Less.</p>
+
+        <form action="{{ url_for('login') }}" method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="form-field">
+                {{ form.email.label }}
+                {{ form.email(placeholder="Email Address", required=True) }}
+                {% for error in form.email.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-field">
+                {{ form.password.label }}
+                {{ form.password(placeholder="Password", required=True) }}
+                {% for error in form.password.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <button class="btn-primary" type="submit">Log In</button>
+        </form>
+
+        <p class="auth-link">Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a>.</p>
+    </section>
+</main>
+{% endblock %}
