@@ -1,0 +1,247 @@
+/* CSS RESETS */
+:where(*, *::before, *::after) {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    color: #1f2421;
+    background: #f7f8f7;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+:root {
+    --bg: #f7f8f7;
+    --surface: #ffffff;
+    --surface-soft: #f6f6f3;
+    --text: #1f2421;
+    --muted: #6b7a6e;
+    --brand: #0f6e56;
+    --brand-hover: #1d9e75;
+    --border: #e3e6e3;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --shadow-sm: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+/* NAVIGATION */
+.left-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e3e6e3;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+}
+
+.left-nav-logo {
+    padding: 0 24px 20px;
+}
+
+.left-nav-logo a {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2f7d57;
+}
+
+.left-nav-links {
+    list-style: none;
+    flex: 1;          /* pushes the account block to the bottom */
+}
+
+.left-nav-links a {
+    display: block;
+    padding: 11px 24px;
+    color: #444c47;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+}
+
+.left-nav-links a:hover {
+    background: #f0f4f1;
+}
+
+.left-nav-links a.is-active {
+    background: #eaf4ee;
+    color: #2f7d57;
+    font-weight: 600;
+    border-left-color: #2f7d57;
+}
+
+
+/* Account block pinned at the bottom of the left nav */
+
+.left-nav-account {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* padding: 16px 24px 4px; */
+    border-top: 1px solid #e3e6e3;
+    position: relative;
+}
+
+
+.account-trigger {
+    /* resets the default button tag styles to inherit the the layout styles of the account section, keeping a nice layout */
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #fff;
+    border: none;
+    border-radius: 0.4rem;;
+    padding: 1rem;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.account-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2f7d57;
+    color: #fff;
+    font-weight: 600;
+}
+
+.account-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.account-menu {
+    position: absolute;
+    bottom: 5rem;
+    left: 1rem;
+    right: 1rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.account-menu a {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.4rem;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.account-trigger:hover, .account-menu a:hover {
+    background: #f0f4f1;
+}
+
+.account-menu.hidden {
+    display: none;
+}
+
+/* -- Main content -- */
+.content {
+    margin-left: 240px;
+    padding: 32px 40px;
+}
+
+.content h1 {
+    margin-bottom: 12px;
+    color: #1f2421;
+}
+
+/* Bottom nav is hidden larger viewports */
+.bottom-nav {
+    display: none;
+}
+
+/* =====================================================
+   MOBILE  NAVIGATION
+   Hide the left nav, show a 5-item bottom nav instead.
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+    .left-nav {
+        display: none;
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 20px 18px 90px;  /* bottom padding clears the nav */
+    }
+
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: #ffffff;
+        border-top: 1px solid #e3e6e3;
+    }
+
+    .bottom-nav a {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        font-size: 0.8rem;
+        color: #444c47;
+    }
+
+    .bottom-nav a.is-active {
+        color: #2f7d57;
+        font-weight: 600;
+    }
+}
