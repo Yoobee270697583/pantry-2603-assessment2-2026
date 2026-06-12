@@ -6,8 +6,8 @@
     left: 0;
     width: 240px;
     height: 100vh;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
+    background: #ffffff;
+    border-right: 1px solid #e3e6e3;
     display: flex;
     flex-direction: column;
     padding-top: 20px;
@@ -25,7 +25,10 @@
 
 .left-nav-links {
     list-style: none;
-    flex: 1;
+    flex: 1;          /* pushes the account block to the bottom */
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .left-nav-links a {
@@ -34,6 +37,7 @@
     color: #444c47;
     font-size: 0.95rem;
     border-left: 3px solid transparent;
+    
 }
 
 .left-nav-links a:hover {
@@ -47,21 +51,27 @@
     border-left-color: #2f7d57;
 }
 
+
+/* Account block pinned at the bottom of the left nav */
+
 .left-nav-account {
     display: flex;
     align-items: center;
     gap: 10px;
-    border-top: 1px solid var(--border);
+    /* padding: 16px 24px 4px; */
+    border-top: 1px solid #e3e6e3;
     position: relative;
 }
 
+
 .account-trigger {
+    /* resets the default button tag styles to inherit the the layout styles of the account section, keeping a nice layout */
     display: flex;
     align-items: center;
     gap: 20px;
-    background: var(--surface);
+    background: #fff;
     border: none;
-    border-radius: 0.4rem;
+    border-radius: 0.4rem;;
     padding: 1rem;
     margin: 0;
     font: inherit;
@@ -92,8 +102,8 @@
     bottom: 5rem;
     left: 1rem;
     right: 1rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: white;
+    border: 1px solid #e0e0e0;
     border-radius: 0.5rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
     padding: 0.5rem;
@@ -110,8 +120,7 @@
     font-size: 0.9rem;
 }
 
-.account-trigger:hover,
-.account-menu a:hover {
+.account-trigger:hover, .account-menu a:hover {
     background: #f0f4f1;
 }
 
@@ -119,6 +128,9 @@
     display: none;
 }
 
+
+
+/* -- Main content -- */
 .content {
     margin-left: 240px;
     padding: 32px 40px;
@@ -126,9 +138,10 @@
 
 .content h1 {
     margin-bottom: 12px;
-    color: var(--text);
+    color: #1f2421;
 }
 
+/* Bottom nav is hidden larger viewports */
 .bottom-nav {
     display: none;
 }
