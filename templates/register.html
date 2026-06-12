@@ -1,64 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login-register-style.css') }}">
-    <title>Register Your Profile - Pantry</title>
-</head>
-<body>
+{% extends "auth_base.html" %}
 
-    <main class="login-register-container">
-        <section class="login-register-card">
-            <img src="{{ url_for('static', filename='img/pantry-icon.svg') }}" alt="Pantry logo">
-            <h1>Register Your Profile</h1>
-            <form action="{{ url_for('register') }}" method="POST">
-                {{ form.hidden_tag() }}
-                <div class="field">
-                    {{ form.first_name.label }}
-                    {{ form.first_name(placeholder="First Name", required=True) }}
-                    {% for error in form.first_name.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="field">
-                    {{ form.last_name.label }}
-                    {{ form.last_name(placeholder="Last Name", required=True) }}
-                    {% for error in form.last_name.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="field">
-                    {{ form.email.label }}
-                    {{ form.email(placeholder="Email Address", required=True) }}
-                    {% for error in form.email.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="field">
-                    {{ form.password.label }}
-                    {{ form.password(placeholder="Password", required=True) }}
-                    <ul>Passwords must contain:
-                        <li>An uppercase letter</li>
-                        <li>A lowercase letter</li>
-                        <li>A number</li>
-                    </ul>
-                    {% for error in form.password.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="field">
-                    {{ form.confirm_password.label }}
-                    {{ form.confirm_password(placeholder="Confirm Password", required=True) }}
-                    {% for error in form.confirm_password.errors %}
-                        <span class="error">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <button class="login-register-btn" type="submit">Register</button>
-            </form>
-            <p class="login-register-link">Already have an account? <a href="{{ url_for('login') }}">Log in here</a>.</p>
-        </section>
-    </main>
-    
-</body>
-</html>
+{% block title %}Register - Pantry{% endblock %}
+
+{% block content %}
+
+<main class="auth-page">
+    <section class="auth-card">
+        <img src="{{ url_for('static', filename='img/pantry-icon.svg') }}" alt="Pantry logo">
+        <h1>Register Your Profile</h1>
+
+        <form action="{{ url_for('register') }}" method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="form-field">
+                {{ form.first_name.label }}
+                {{ form.first_name(placeholder="First Name", required=True) }}
+                {% for error in form.first_name.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-field">
+                {{ form.last_name.label }}
+                {{ form.last_name(placeholder="Last Name", required=True) }}
+                {% for error in form.last_name.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-field">
+                {{ form.email.label }}
+                {{ form.email(placeholder="Email Address", required=True) }}
+                {% for error in form.email.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-field">
+                {{ form.password.label }}
+                {{ form.password(placeholder="Password", required=True) }}
+                <ul>Passwords must contain:
+                    <li>An uppercase letter</li>
+                    <li>A lowercase letter</li>
+                    <li>A number</li>
+                </ul>
+                {% for error in form.password.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-field">
+                {{ form.confirm_password.label }}
+                {{ form.confirm_password(placeholder="Confirm Password", required=True) }}
+                {% for error in form.confirm_password.errors %}
+                    <span class="form-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <button class="btn-primary" type="submit">Register</button>
+        </form>
+
+        <p class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Log in here</a>.</p>
+    </section>
+</main>
+
+{% endblock %}
