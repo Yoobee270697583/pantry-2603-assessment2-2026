@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, FloatField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Regexp
 from models import User
 
@@ -29,3 +29,14 @@ class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Email(message='Invalid email'), Length(max=150)])
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
     submit = SubmitField('Login')
+
+# Add Pantry Item Form
+class AddPantryItemForm(FlaskForm):
+    # Pantry item name
+    name = StringField(validators=[InputRequired(), Length(min=1, max=150)])
+    # Pantry Item quantity, using FloatField to allow for decimal quantities (e.g., 1.5 cups)
+    quantity = FloatField(validators=[InputRequired()])
+    # Pantry Item unit, i.e. kg, g, ml, L, cup etc.
+    unit = StringField(validators=[InputRequired(), Length(min=1, max=50)])
+    
+    submit = SubmitField('Add Item')
