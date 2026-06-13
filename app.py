@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from models import db, User
+from models import db, User, PantryItem
 from api_helper import search_recipes, get_recipe_by_id, get_ingredients
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, AddPantryItemForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -114,6 +114,20 @@ def kitchen():
 def pantry():
     return render_template("pantry.html", active_page="pantry")
 
+@app.route("/add_pantry_item", methods=['POST', 'GET'])
+@login_required
+def add_pantry_item():
+    form = AddPantryItemForm()
+    if form.validate_on_submit():
+        new_pantry_item = PantryItem(name=form.name.data, quantity=form.quantity.data, unit=form.unit.data, owner=current_user)
+        try:
+            db.session.add(new_pantry_item)
+            db.session.commit()
+            flash('Pantry item added successfully.')
+        except Exception:
+            db.session.rollback()
+            flash('Something went wrong adding the pantry item. Please try again.', 'error')
+    return render_template("add_pantry_item.html", active_page="add_pantry_item")
 
 @app.route("/recipes")
 @login_required
