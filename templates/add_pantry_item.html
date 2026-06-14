@@ -1,39 +1,44 @@
 {% extends "base.html" %}
 
 {% block title %}Add Pantry Item - Pantry{% endblock %}
-{% block styles %}{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pantry.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Add Pantry Item</h1>
+<div class="page-header">
+    <h1>Add Pantry Item</h1>
+    <a href="/pantry" class="back-link">← back to pantry</a>
+</div>
 <form method="POST">
     {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.name.label }}<br>
-        {{ form.name(size=32) }}<br>
+    <div class="form-field pantry-form-field">
+        {{ form.name.label }}
+        {{ form.name(size=32) }}
         {% for error in form.name.errors %}
-            <span class="error">{{ error }}</span><br>
+            <span class="form-error">{{ error }}</span>
         {% endfor %}
     </div>
-    <div class="form-group">
-        {{ form.quantity.label }}<br>
-        {{ form.quantity() }}<br>
+    <div class="form-field pantry-form-field">
+        {{ form.quantity.label }}
+        {{ form.quantity() }}
         {% for error in form.quantity.errors %}
-            <span class="error">{{ error }}</span><br>
+            <span class="form-error">{{ error }}</span>
         {% endfor %}
     </div>
-    <div class="form-group">
-        {{ form.unit.label }}<br>
-        {{ form.unit(size=20) }}<br>
+    <div class="form-field pantry-form-field">
+        {{ form.unit.label }}
+        {{ form.unit(size=20) }}
         {% for error in form.unit.errors %}
-            <span class="error">{{ error }}</span><br>
+            <span class="form-error">{{ error }}</span>
         {% endfor %}
     </div>
-    <div class="form-group">
-        {{ form.expiry_date.label }}<br>
-        {{ form.expiry_date }}<br>
+    <div class="form-field pantry-form-field">
+        {{ form.expiry_date.label }}
+        {{ form.expiry_date }}
         {% for error in form.expiry_date.errors %}
-            <span class="error">{{ error }}</span><br>
+            <span class="form-error">{{ error }}</span>
         {% endfor %}
     </div>
-    {{ form.submit() }}
+    <button type="submit" class="btn-primary">Add Item</button>
 </form>
 {% endblock %}
