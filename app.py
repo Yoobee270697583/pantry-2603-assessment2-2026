@@ -114,7 +114,7 @@ def kitchen():
 def pantry():
     return render_template("pantry.html", active_page="pantry")
 
-@app.route("/add_pantry_item", methods=['POST', 'GET'])
+@app.route("/add_pantry_item", methods=['GET', 'POST'])
 @login_required
 def add_pantry_item():
     form = AddPantryItemForm()
@@ -124,10 +124,11 @@ def add_pantry_item():
             db.session.add(new_pantry_item)
             db.session.commit()
             flash('Pantry item added successfully.')
+            return redirect(url_for('pantry'))  # redirect after success
         except Exception:
             db.session.rollback()
             flash('Something went wrong adding the pantry item. Please try again.', 'error')
-    return render_template("add_pantry_item.html", active_page="add_pantry_item")
+    return render_template("add_pantry_item.html", form=form, active_page="pantry")
 
 @app.route("/recipes")
 @login_required
