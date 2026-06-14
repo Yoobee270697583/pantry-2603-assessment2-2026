@@ -1,0 +1,20 @@
+.pantry-form-field.form-field input {
+    width: 50%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;        /* visible border so inputs stand out */
+    background: #ffffff;           /* white bg instead of the soft surface */
+}
+
+.pantry-form-field.form-field input:focus {
+    border-color: #e0a800;         /* gold focus ring to match pantry theme */
+    box-shadow: 0 0 0 3px rgba(224, 168, 0, 0.15);
+}
+
+.pantry-form-field.form-field {
+    gap: 0.2rem;
+    margin-bottom: 1.2rem;         /* some breathing room between fields */
+}
+
+.pantry-form-field.form-field label {
+    color: #222;                   /* darker label for contrast */
+}
