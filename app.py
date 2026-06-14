@@ -112,14 +112,15 @@ def kitchen():
 @app.route("/pantry")
 @login_required
 def pantry():
-    return render_template("pantry.html", active_page="pantry")
+    pantry_items = PantryItem.query.filter_by(owner=current_user).all()
+    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items)
 
 @app.route("/add_pantry_item", methods=['GET', 'POST'])
 @login_required
 def add_pantry_item():
     form = AddPantryItemForm()
     if form.validate_on_submit():
-        new_pantry_item = PantryItem(name=form.name.data, quantity=form.quantity.data, unit=form.unit.data, owner=current_user)
+        new_pantry_item = PantryItem(name=form.name.data, quantity=form.quantity.data, unit=form.unit.data, expiry_date = form.expiry_date.data ,owner=current_user)
         try:
             db.session.add(new_pantry_item)
             db.session.commit()
