@@ -3,7 +3,10 @@
 {% block title %}My Pantry — Pantry{% endblock %}
 
 {% block content %}
-<h1>My Pantry</h1>
+<div class="page-header">
+    <h1>My Pantry</h1>
+    <a class="btn-primary" href="/add_pantry_item">+ Add Pantry Item</a>
+</div>
 
 {% if pantry_items %}
 <table class="pantry-table">
@@ -29,5 +32,4 @@
 {% else %}
 <p>Your pantry is currently empty. Use the "Add Pantry Item" button to add ingredients you have on hand.</p>
 {% endif %}
-<a href="/add_pantry_item" class="btn-add">+ Add Pantry Item</a>
 {% endblock %}
