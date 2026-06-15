@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
 from models import User
 
@@ -40,3 +40,14 @@ class CustomRecipeForm(FlaskForm):
     ingredients = TextAreaField(validators=[InputRequired()])
     instructions = TextAreaField(validators=[InputRequired()])
     submit = SubmitField('Save Recipe')
+
+# Add Pantry Item Form
+class AddPantryItemForm(FlaskForm):
+    # Pantry item name
+    name = StringField(validators=[InputRequired(), Length(min=1, max=150)])
+    # Pantry Item quantity, using FloatField to allow for decimal quantities (e.g., 1.5 cups)
+    quantity = FloatField(validators=[InputRequired()])
+    # Pantry Item unit, i.e. kg, g, ml, L, cup etc.
+    unit = StringField(validators=[InputRequired(), Length(min=1, max=50)])
+    expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
+    submit = SubmitField('Add Item')
