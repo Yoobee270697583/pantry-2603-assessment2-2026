@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from models import db, User, PantryItem
-from api_helper import search_recipes, get_recipe_by_id, get_ingredients
+from models import db, User, Recipe, RecipeIngredient, PantryItem
+from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegisterForm, AddPantryItemForm
+from forms import LoginForm, RegisterForm, CustomRecipeForm, AddPantryItemForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -134,25 +134,97 @@ def add_pantry_item():
 @app.route("/recipes")
 @login_required
 def recipes():
-    # get the search query from the url e.g. /recipes?q=pasta
-    search_query = request.args.get("q", "").strip()
+    # which tab is active, default to saved
+    active_tab = request.args.get("tab", "saved")
 
-    results = []
+    # variables used by different tabs
+    api_results = []
+    saved_recipes = []
+    community_recipes = []
+    custom_recipes = []
+    search_query = ""
+    selected_category = ""
+    selected_area = ""
     error_message = ""
+    categories = []
+    areas = []
 
-    if search_query:
-        results = search_recipes(search_query)
+    if active_tab == "search":
+        # pantry recipe library tab - search the api
+        search_query = request.args.get("q", "").strip()
+        selected_category = request.args.get("category", "").strip()
+        selected_area = request.args.get("area", "").strip()
 
-        if len(results) == 0:
-            error_message = f"no recipes found for '{search_query}', try something else"
+        categories = get_categories()
+        areas = get_areas()
+
+        if search_query:
+            api_results = search_recipes(search_query)
+            if len(api_results) == 0:
+                error_message = f"no recipes found for '{search_query}', try something else"
+
+        elif selected_category:
+            api_results = filter_by_category(selected_category)
+            if len(api_results) == 0:
+                error_message = f"no recipes found in '{selected_category}'"
+
+        elif selected_area:
+            api_results = filter_by_area(selected_area)
+            if len(api_results) == 0:
+                error_message = f"no recipes found for '{selected_area}' cuisine"
+
+    elif active_tab == "saved":
+        # all recipes this user has saved
+        saved_recipes = Recipe.query.filter_by(user_id=current_user.id).all()
+
+    elif active_tab == "community":
+        # custom recipes submitted by other users
+        community_search = request.args.get("q", "").strip()
+        search_query = community_search
+
+        query = Recipe.query.filter(
+            Recipe.source == "Custom",
+            Recipe.user_id != current_user.id
+        )
+
+        if community_search:
+            query = query.filter(Recipe.name.ilike(f"%{community_search}%"))
+
+        community_recipes = query.all()
+
+    elif active_tab == "custom":
+        # recipes the current user created themselves
+        custom_recipes = Recipe.query.filter_by(
+            user_id=current_user.id,
+            source="Custom"
+        ).all()
 
     return render_template(
         "recipes.html",
         active_page="recipes",
-        results=results,
+        active_tab=active_tab,
+        api_results=api_results,
+        saved_recipes=saved_recipes,
+        community_recipes=community_recipes,
+        custom_recipes=custom_recipes,
         search_query=search_query,
-        error_message=error_message
+        selected_category=selected_category,
+        selected_area=selected_area,
+        error_message=error_message,
+        categories=categories,
+        areas=areas
     )
+
+
+@app.route("/recipe/random")
+@login_required
+def recipe_random():
+    meal = get_random_recipe()
+
+    if meal is None:
+        return render_template("not_found.html", active_page="recipes"), 404
+
+    return redirect(url_for("recipe_detail", meal_id=meal["idMeal"]))
 
 
 @app.route("/recipe/<meal_id>")
@@ -165,12 +237,121 @@ def recipe_detail(meal_id):
 
     ingredients = get_ingredients(meal)
 
+    # check if the user has already saved this recipe
+    is_saved = Recipe.query.filter_by(
+        user_id=current_user.id,
+        mealdb_id=meal_id
+    ).first() is not None
+
     return render_template(
         "recipe_detail.html",
         active_page="recipes",
         meal=meal,
-        ingredients=ingredients
+        ingredients=ingredients,
+        is_saved=is_saved
     )
+
+
+@app.route("/recipe/save/<meal_id>", methods=["POST"])
+@login_required
+def save_recipe(meal_id):
+    # check if the user already saved this recipe
+    existing = Recipe.query.filter_by(user_id=current_user.id, mealdb_id=meal_id).first()
+
+    if existing:
+        flash("recipe already saved")
+        return redirect(url_for("recipe_detail", meal_id=meal_id))
+
+    meal = get_recipe_by_id(meal_id)
+
+    if meal is None:
+        flash("could not find that recipe")
+        return redirect(url_for("recipes"))
+
+    new_recipe = Recipe(
+        mealdb_id=meal["idMeal"],
+        name=meal["strMeal"],
+        category=meal.get("strCategory", ""),
+        area=meal.get("strArea", ""),
+        instructions=meal.get("strInstructions", ""),
+        image_url=meal.get("strMealThumb", ""),
+        youtube_url=meal.get("strYoutube", ""),
+        source="TheMealDB",
+        user_id=current_user.id
+    )
+    db.session.add(new_recipe)
+    db.session.flush()
+
+    # save the ingredients linked to this recipe
+    for item in get_ingredients(meal):
+        ingredient = RecipeIngredient(
+            name=item["name"],
+            amount=item["amount"],
+            recipe_id=new_recipe.id
+        )
+        db.session.add(ingredient)
+
+    db.session.commit()
+    flash("recipe saved!")
+    return redirect(url_for("recipe_detail", meal_id=meal_id))
+
+
+@app.route("/recipes/saved/<int:recipe_id>")
+@login_required
+def saved_recipe_detail(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    return render_template(
+        "saved_recipe_detail.html",
+        active_page="recipes",
+        recipe=recipe
+    )
+
+
+@app.route("/recipes/create", methods=["GET", "POST"])
+@login_required
+def create_recipe():
+    form = CustomRecipeForm()
+
+    if form.validate_on_submit():
+        new_recipe = Recipe(
+            name=form.name.data,
+            category=form.category.data,
+            area=form.area.data,
+            instructions=form.instructions.data,
+            source="Custom",
+            user_id=current_user.id
+        )
+        db.session.add(new_recipe)
+        db.session.flush()
+
+        # parse ingredients - each line is "amount, name" or just "name"
+        raw_lines = form.ingredients.data.strip().split("\n")
+        for line in raw_lines:
+            line = line.strip()
+            if not line:
+                continue
+
+            if "," in line:
+                parts = line.split(",", 1)
+                amount = parts[0].strip()
+                name = parts[1].strip()
+            else:
+                amount = ""
+                name = line
+
+            if name:
+                ingredient = RecipeIngredient(
+                    name=name,
+                    amount=amount,
+                    recipe_id=new_recipe.id
+                )
+                db.session.add(ingredient)
+
+        db.session.commit()
+        flash("recipe created!")
+        return redirect(url_for("recipes", tab="custom"))
+
+    return render_template("create_recipe.html", active_page="recipes", form=form)
 
 
 @app.route("/suggestions")
