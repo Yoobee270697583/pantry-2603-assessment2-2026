@@ -40,3 +40,14 @@ class CustomRecipeForm(FlaskForm):
     ingredients = TextAreaField(validators=[InputRequired()])
     instructions = TextAreaField(validators=[InputRequired()])
     submit = SubmitField('Save Recipe')
+
+
+# form for editing an existing saved recipe
+class EditRecipeForm(FlaskForm):
+    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
+    category = StringField(validators=[Optional(), Length(max=100)])
+    area = StringField(validators=[Optional(), Length(max=100)])
+    image_url = StringField(validators=[Optional(), Length(max=500)])
+    ingredients = TextAreaField(validators=[InputRequired()])
+    instructions = TextAreaField(validators=[InputRequired()])
+    submit = SubmitField('Save Changes')
