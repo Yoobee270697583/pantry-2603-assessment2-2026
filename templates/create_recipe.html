@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Create Recipe — Pantry{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<a href="{{ url_for('recipes', tab='custom') }}" class="back-link">← back to my recipes</a>
+
+<h1>Create a Recipe</h1>
+
+<form action="{{ url_for('create_recipe') }}" method="POST" class="recipe-form">
+    {{ form.hidden_tag() }}
+
+    <div class="form-field">
+        <label for="name">Recipe Name *</label>
+        {{ form.name(id="name", class="form-input", placeholder="e.g. Grandma's Pasta") }}
+        {% if form.name.errors %}
+            <p class="form-error">{{ form.name.errors[0] }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-row">
+        <div class="form-field">
+            <label for="category">Category</label>
+            {{ form.category(id="category", class="form-input", placeholder="e.g. Pasta, Dessert") }}
+        </div>
+
+        <div class="form-field">
+            <label for="area">Cuisine</label>
+            {{ form.area(id="area", class="form-input", placeholder="e.g. Italian, Japanese") }}
+        </div>
+    </div>
+
+    <div class="form-field">
+        <label for="ingredients">Ingredients *</label>
+        <p class="form-hint">one per line — format: amount, ingredient name</p>
+        <p class="form-hint">e.g. "2 cups, flour" or just "salt"</p>
+        {{ form.ingredients(id="ingredients", class="form-textarea", rows=10, placeholder="2 cups, flour\n1 tsp, salt\n3, eggs") }}
+        {% if form.ingredients.errors %}
+            <p class="form-error">{{ form.ingredients.errors[0] }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-field">
+        <label for="instructions">Instructions *</label>
+        {{ form.instructions(id="instructions", class="form-textarea", rows=12, placeholder="Step 1: ...") }}
+        {% if form.instructions.errors %}
+            <p class="form-error">{{ form.instructions.errors[0] }}</p>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn-submit">Save Recipe</button>
+</form>
+
+{% endblock %}

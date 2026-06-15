@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Regexp
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
 from models import User
 
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
@@ -29,3 +29,14 @@ class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Email(message='Invalid email'), Length(max=150)])
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
     submit = SubmitField('Login')
+
+
+# form for creating a custom recipe
+class CustomRecipeForm(FlaskForm):
+    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
+    category = StringField(validators=[Optional(), Length(max=100)])
+    area = StringField(validators=[Optional(), Length(max=100)])
+    # one ingredient per line, format: "amount, ingredient name"
+    ingredients = TextAreaField(validators=[InputRequired()])
+    instructions = TextAreaField(validators=[InputRequired()])
+    submit = SubmitField('Save Recipe')

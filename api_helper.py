@@ -54,6 +54,106 @@ def get_recipe_by_id(meal_id):
         return None
 
 
+def get_random_recipe():
+    # calls the random endpoint and returns one meal
+
+    try:
+        url = BASE_URL + "random.php"
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return None
+
+        return data["meals"][0]
+
+    except Exception as error:
+        print(f"couldnt get random recipe: {error}")
+        return None
+
+
+def get_categories():
+    # returns a list of all category names
+
+    try:
+        url = BASE_URL + "list.php"
+        response = requests.get(url, params={"c": "list"}, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return []
+
+        return [meal["strCategory"] for meal in data["meals"]]
+
+    except Exception as error:
+        print(f"couldnt get categories: {error}")
+        return []
+
+
+def get_areas():
+    # returns a list of all cuisine area names
+
+    try:
+        url = BASE_URL + "list.php"
+        response = requests.get(url, params={"a": "list"}, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return []
+
+        return [meal["strArea"] for meal in data["meals"]]
+
+    except Exception as error:
+        print(f"couldnt get areas: {error}")
+        return []
+
+
+def filter_by_category(category):
+    # returns meals that match the given category
+
+    try:
+        url = BASE_URL + "filter.php"
+        response = requests.get(url, params={"c": category}, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return []
+
+        return data["meals"]
+
+    except Exception as error:
+        print(f"couldnt filter by category: {error}")
+        return []
+
+
+def filter_by_area(area):
+    # returns meals that match the given cuisine area
+
+    try:
+        url = BASE_URL + "filter.php"
+        response = requests.get(url, params={"a": area}, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return []
+
+        return data["meals"]
+
+    except Exception as error:
+        print(f"couldnt filter by area: {error}")
+        return []
+
+
 def get_ingredients(meal):
     # the api stores ingredients as strIngredient1, strIngredient2 etc up to 20
     # this turns that into a normal list

@@ -6,7 +6,16 @@
 {% endblock %}
 {% block content %}
 
-<a href="/recipes" class="back-link">← back to recipes</a>
+<!-- flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<a href="{{ url_for('recipes', tab='search') }}" class="back-link">← back to recipes</a>
 
 <div class="recipe-header">
     <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="recipe-hero-img">
@@ -16,10 +25,22 @@
             <span class="tag">{{ meal.strCategory }}</span>
             <span class="tag">{{ meal.strArea }}</span>
         </p>
-        <!-- only show if the api returned a youtube link -->
-        {% if meal.strYoutube %}
-            <a href="{{ meal.strYoutube }}" target="_blank" class="btn-youtube">▶ watch on youtube</a>
-        {% endif %}
+
+        <div class="recipe-actions">
+            <!-- save button changes state if already saved -->
+            {% if is_saved %}
+                <span class="btn-saved">✓ Saved</span>
+            {% else %}
+                <form action="{{ url_for('save_recipe', meal_id=meal.idMeal) }}" method="POST">
+                    <button type="submit" class="btn-save">Save Recipe</button>
+                </form>
+            {% endif %}
+
+            <!-- only show if the api returned a youtube link -->
+            {% if meal.strYoutube %}
+                <a href="{{ meal.strYoutube }}" target="_blank" class="btn-youtube">▶ watch on youtube</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 
