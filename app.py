@@ -124,11 +124,11 @@ def add_pantry_item():
         try:
             db.session.add(new_pantry_item)
             db.session.commit()
-            flash('Pantry item added successfully.')
+            # flash('Pantry item added successfully.')
             return redirect(url_for('pantry'))  # redirect after success
         except Exception:
             db.session.rollback()
-            flash('Something went wrong adding the pantry item. Please try again.', 'error')
+            # flash('Something went wrong adding the pantry item. Please try again.', 'error')
     return render_template("add_pantry_item.html", form=form, active_page="pantry")
 
 @app.route("/recipes")
