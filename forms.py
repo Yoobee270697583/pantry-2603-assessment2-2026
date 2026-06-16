@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField, SelectField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
 from models import User
-from constants import pantry_category_choices
+from constants import PANTRY_CATEGORY_CHOICES
 
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
 class RegisterForm(FlaskForm):
@@ -51,7 +51,7 @@ class AddPantryItemForm(FlaskForm):
     # Pantry Item category
     category = SelectField(
         "Category",
-        choices=pantry_category_choices,
+        choices=PANTRY_CATEGORY_CHOICES,
         validators=[InputRequired()]
     )
     # Pantry Item unit, i.e. kg, g, ml, L, cup etc.
