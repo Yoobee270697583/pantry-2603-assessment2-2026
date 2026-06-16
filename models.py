@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from constants import CATEGORY_LABELS, UNIT_LABELS
 
 # Database instance
 db = SQLAlchemy()
@@ -63,6 +64,12 @@ class PantryItem(db.Model):
         nullable=False
     )
 
+    # Item category
+    category = db.Column(
+        db.String(100),
+        nullable = False
+    )
+
     # Amount currently owned
     quantity = db.Column(
         db.Float, 
@@ -71,7 +78,8 @@ class PantryItem(db.Model):
 
     # Unit of measurement (kg, g, L, mL etc)
     unit = db.Column(
-        db.String(50)
+        db.String(50),
+        nullable=False
     )
 
     # Optional expiry date
@@ -85,6 +93,16 @@ class PantryItem(db.Model):
         db.ForeignKey("user.id"), 
         nullable=False
     )
+
+    @property
+    def category_label(self):
+        """Returns the display label for the stored category value."""
+        return CATEGORY_LABELS.get(self.category, self.category)
+    
+    @property
+    def unit_label(self):
+        """Returns the display label for the stored unit value."""
+        return UNIT_LABELS.get(self.unit, self.unit)
 
 class RecipeIngredient(db.Model):
     """

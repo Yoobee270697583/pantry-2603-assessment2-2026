@@ -1,11 +1,15 @@
-.pantry-form-field.form-field input {
+.pantry-form-field.form-field input,
+.pantry-form-field.form-field select
+{
     width: 50%;
     padding: 0.75rem 1rem;
     border: 1px solid #ccc;        /* visible border so inputs stand out */
     background: #ffffff;           /* white bg instead of the soft surface */
 }
 
-.pantry-form-field.form-field input:focus {
+.pantry-form-field.form-field input:focus,
+.pantry-form-field.form-field select:focus
+{
     border-color: #e0a800;         /* gold focus ring to match pantry theme */
     box-shadow: 0 0 0 3px rgba(224, 168, 0, 0.15);
 }
@@ -43,4 +47,16 @@
 .btn-icon--danger:hover {
     background: #fff0f0;
     color: #c0392b;
+}
+
+.pantry-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.pantry-toolbar .search-form {
+    flex: 1;
+    margin: 0;
 }

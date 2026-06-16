@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField
-from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Regexp, Optional
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField, SelectField
+from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
 from models import User
+from constants import PANTRY_CATEGORY_CHOICES, PANTRY_UNIT_CHOICES
 
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
 class RegisterForm(FlaskForm):
@@ -58,8 +59,18 @@ class AddPantryItemForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(min=1, max=150)])
     # Pantry Item quantity, using FloatField to allow for decimal quantities (e.g., 1.5 cups)
     quantity = FloatField(validators=[InputRequired()])
+    # Pantry Item category
+    category = SelectField(
+        "Category",
+        choices=PANTRY_CATEGORY_CHOICES,
+        validators=[InputRequired()]
+    )
     # Pantry Item unit, i.e. kg, g, ml, L, cup etc.
-    unit = StringField(validators=[InputRequired(), Length(min=1, max=50)])
+    unit = SelectField(
+        "Unit",
+        choices=PANTRY_UNIT_CHOICES,
+        validators=[InputRequired()]
+    )
     expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add Item')
 
