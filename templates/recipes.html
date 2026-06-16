@@ -1,39 +1,97 @@
 {% extends "base.html" %}
 
 {% block title %}My Recipes — Pantry{% endblock %}
+
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
 {% endblock %}
-{% block content %}
 
-<!-- flash messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+{% block content %}
 
 <div class="page-header">
     <h1>My Recipes</h1>
-    <!-- + button goes to the create recipe page -->
-    <a href="{{ url_for('create_recipe') }}" class="btn-create" title="Create a recipe">+</a>
+    <div class="page-header-actions">
+        <a href="{{ url_for('recipe_random') }}" class="btn-random">Random Recipe</a>
+        <a href="{{ url_for('create_recipe') }}" class="btn-create">+ New Recipe</a>
+    </div>
 </div>
 
-<!-- 4 tabs -->
+<!-- 3 tabs -->
 <div class="tab-bar">
-    <a href="{{ url_for('recipes', tab='saved') }}"     class="tab {% if active_tab == 'saved' %}is-active{% endif %}">Saved Recipes</a>
-    <a href="{{ url_for('recipes', tab='search') }}"    class="tab {% if active_tab == 'search' %}is-active{% endif %}">Pantry Recipe Library</a>
-    <a href="{{ url_for('recipes', tab='community') }}" class="tab {% if active_tab == 'community' %}is-active{% endif %}">User Submitted</a>
-    <a href="{{ url_for('recipes', tab='custom') }}"    class="tab {% if active_tab == 'custom' %}is-active{% endif %}">My Custom Recipes</a>
+    <a href="{{ url_for('recipes', tab='saved') }}"   class="tab {% if active_tab == 'saved' %}is-active{% endif %}">Saved Recipes</a>
+    <a href="{{ url_for('recipes', tab='search') }}"  class="tab {% if active_tab == 'search' %}is-active{% endif %}">Pantry Recipe Library</a>
+    <a href="{{ url_for('recipes', tab='created') }}" class="tab {% if active_tab == 'created' %}is-active{% endif %}">My Created Recipes</a>
 </div>
 
 
 <!-- ================================================
-     TAB: Pantry Recipe Library (api search)
+     Saved Recipes
      ================================================ -->
-{% if active_tab == 'search' %}
+{% if active_tab == 'saved' %}
+
+    <div class="filter-bar">
+
+        <!-- filter by category (up to 5 from saved recipes) -->
+        {% if saved_categories %}
+        <form action="{{ url_for('recipes') }}" method="GET">
+            <input type="hidden" name="tab" value="saved">
+            <input type="hidden" name="sort" value="{{ saved_sort }}">
+            <select name="filter_category" class="filter-select" onchange="this.form.submit()">
+                <option value="">All categories</option>
+                {% for cat in saved_categories %}
+                    <option value="{{ cat }}" {% if saved_filter_category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+
+        <!-- sort order -->
+        <form action="{{ url_for('recipes') }}" method="GET">
+            <input type="hidden" name="tab" value="saved">
+            <input type="hidden" name="filter_category" value="{{ saved_filter_category }}">
+            <select name="sort" class="filter-select" onchange="this.form.submit()">
+                <option value="newest" {% if saved_sort == 'newest' %}selected{% endif %}>Newest first</option>
+                <option value="oldest" {% if saved_sort == 'oldest' %}selected{% endif %}>Oldest first</option>
+                <option value="name_az" {% if saved_sort == 'name_az' %}selected{% endif %}>Name A–Z</option>
+                <option value="name_za" {% if saved_sort == 'name_za' %}selected{% endif %}>Name Z–A</option>
+            </select>
+        </form>
+
+        {% if saved_filter_category %}
+            <a href="{{ url_for('recipes', tab='saved') }}" class="filter-clear">Clear filter</a>
+        {% endif %}
+
+    </div>
+
+    {% if saved_recipes %}
+        <p class="results-count">{{ saved_recipes | length }} recipe(s)</p>
+        <div class="recipe-grid">
+            {% for recipe in saved_recipes %}
+            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
+                {% if recipe.image_url %}
+                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="recipe-card-img">
+                {% else %}
+                    <div class="recipe-card-no-img">No Image</div>
+                {% endif %}
+                <div class="recipe-card-body">
+                    <h3 class="recipe-card-title">{{ recipe.name }}</h3>
+                    {% if recipe.category or recipe.area %}
+                        <p class="recipe-card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                    {% endif %}
+                    <p class="recipe-card-source">{{ recipe.source }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">no saved recipes yet — find one in the Pantry Recipe Library and save it</p>
+    {% endif %}
+
+
+<!-- ================================================
+     Pantry Recipe Library (api search)
+     ================================================ -->
+{% elif active_tab == 'search' %}
 
     <div class="toolbar">
         <form action="{{ url_for('recipes') }}" method="GET" class="search-form">
@@ -48,33 +106,37 @@
             <button type="submit" class="btn-search">Search</button>
         </form>
 
-        <a href="{{ url_for('recipe_random') }}" class="btn-secondary">Random Recipe</a>
+        <a href="{{ url_for('recipe_random') }}" class="btn-random">Random Recipe</a>
     </div>
 
-    <!-- category and area filter dropdowns -->
+    <!-- 5 hardcoded category and cuisine filters -->
     <div class="filter-bar">
         <form action="{{ url_for('recipes') }}" method="GET">
             <input type="hidden" name="tab" value="search">
             <select name="category" class="filter-select" onchange="this.form.submit()">
-                <option value="">Filter by category</option>
-                {% for cat in categories %}
-                    <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
-                {% endfor %}
+                <option value="">Category</option>
+                <option value="Beef"       {% if selected_category == 'Beef' %}selected{% endif %}>Beef</option>
+                <option value="Chicken"    {% if selected_category == 'Chicken' %}selected{% endif %}>Chicken</option>
+                <option value="Seafood"    {% if selected_category == 'Seafood' %}selected{% endif %}>Seafood</option>
+                <option value="Vegetarian" {% if selected_category == 'Vegetarian' %}selected{% endif %}>Vegetarian</option>
+                <option value="Dessert"    {% if selected_category == 'Dessert' %}selected{% endif %}>Dessert</option>
             </select>
         </form>
 
         <form action="{{ url_for('recipes') }}" method="GET">
             <input type="hidden" name="tab" value="search">
             <select name="area" class="filter-select" onchange="this.form.submit()">
-                <option value="">Filter by cuisine</option>
-                {% for area in areas %}
-                    <option value="{{ area }}" {% if selected_area == area %}selected{% endif %}>{{ area }}</option>
-                {% endfor %}
+                <option value="">Cuisine</option>
+                <option value="Italian"  {% if selected_area == 'Italian' %}selected{% endif %}>Italian</option>
+                <option value="Chinese"  {% if selected_area == 'Chinese' %}selected{% endif %}>Chinese</option>
+                <option value="Indian"   {% if selected_area == 'Indian' %}selected{% endif %}>Indian</option>
+                <option value="Mexican"  {% if selected_area == 'Mexican' %}selected{% endif %}>Mexican</option>
+                <option value="Japanese" {% if selected_area == 'Japanese' %}selected{% endif %}>Japanese</option>
             </select>
         </form>
 
         {% if selected_category or selected_area %}
-            <a href="{{ url_for('recipes', tab='search') }}" class="filter-clear">Clear filter</a>
+            <a href="{{ url_for('recipes', tab='search') }}" class="filter-clear">Clear</a>
         {% endif %}
     </div>
 
@@ -110,13 +172,13 @@
 
 
 <!-- ================================================
-     TAB: Saved Recipes
+     My Created Recipes (custom recipes from all users)
      ================================================ -->
-{% elif active_tab == 'saved' %}
+{% elif active_tab == 'created' %}
 
-    {% if saved_recipes %}
+    {% if created_recipes %}
         <div class="recipe-grid">
-            {% for recipe in saved_recipes %}
+            {% for recipe in created_recipes %}
             <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
                 {% if recipe.image_url %}
                     <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="recipe-card-img">
@@ -128,85 +190,18 @@
                     {% if recipe.category or recipe.area %}
                         <p class="recipe-card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
                     {% endif %}
-                    <p class="recipe-card-source">{{ recipe.source }}</p>
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="empty-state">no saved recipes yet — find one in the Pantry Recipe Library and save it</p>
-    {% endif %}
-
-
-<!-- ================================================
-     TAB: User Submitted Recipes
-     ================================================ -->
-{% elif active_tab == 'community' %}
-
-    <form action="{{ url_for('recipes') }}" method="GET" class="search-form">
-        <input type="hidden" name="tab" value="community">
-        <input
-            type="text"
-            name="q"
-            class="search-input"
-            placeholder="search user submitted recipes..."
-            value="{{ search_query }}"
-        >
-        <button type="submit" class="btn-search">Search</button>
-    </form>
-
-    {% if community_recipes %}
-        <div class="recipe-grid">
-            {% for recipe in community_recipes %}
-            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
-                {% if recipe.image_url %}
-                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="recipe-card-img">
-                {% else %}
-                    <div class="recipe-card-no-img">No Image</div>
-                {% endif %}
-                <div class="recipe-card-body">
-                    <h3 class="recipe-card-title">{{ recipe.name }}</h3>
-                    {% if recipe.category or recipe.area %}
-                        <p class="recipe-card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                    <!-- show a badge if this recipe belongs to the current user -->
+                    {% if recipe.user_id == current_user.id %}
+                        <p class="recipe-card-source">Your recipe</p>
+                    {% else %}
+                        <p class="recipe-card-source">Community</p>
                     {% endif %}
                 </div>
             </a>
             {% endfor %}
         </div>
     {% else %}
-        {% if search_query %}
-            <p class="empty-state">no results for "{{ search_query }}"</p>
-        {% else %}
-            <p class="empty-state">no user submitted recipes yet</p>
-        {% endif %}
-    {% endif %}
-
-
-<!-- ================================================
-     TAB: My Custom Recipes
-     ================================================ -->
-{% elif active_tab == 'custom' %}
-
-    {% if custom_recipes %}
-        <div class="recipe-grid">
-            {% for recipe in custom_recipes %}
-            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
-                {% if recipe.image_url %}
-                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="recipe-card-img">
-                {% else %}
-                    <div class="recipe-card-no-img">No Image</div>
-                {% endif %}
-                <div class="recipe-card-body">
-                    <h3 class="recipe-card-title">{{ recipe.name }}</h3>
-                    {% if recipe.category or recipe.area %}
-                        <p class="recipe-card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
-                    {% endif %}
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="empty-state">no custom recipes yet — use the + button to create one</p>
+        <p class="empty-state">no created recipes yet — use + New Recipe to add one</p>
     {% endif %}
 
 {% endif %}
