@@ -3,7 +3,7 @@ from models import db, User, Recipe, RecipeIngredient, PantryItem
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm
+from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -108,12 +108,13 @@ def register():
 def kitchen():
     return render_template("kitchen.html", active_page="kitchen")
 
-
+# Pantry functionalities
 @app.route("/pantry")
 @login_required
 def pantry():
     pantry_items = PantryItem.query.filter_by(owner=current_user).all()
-    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items)
+    deleteForm = DeletePantryItemForm()
+    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items, form=deleteForm)
 
 @app.route("/add_pantry_item", methods=['GET', 'POST'])
 @login_required
@@ -130,6 +131,27 @@ def add_pantry_item():
             db.session.rollback()
             # flash('Something went wrong adding the pantry item. Please try again.', 'error')
     return render_template("add_pantry_item.html", form=form, active_page="pantry")
+
+@app.route("/pantry/delete/<int:item_id>", methods=["POST"])
+def delete_pantry_item(item_id):
+    item = PantryItem.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for("pantry"))
+
+@app.route("/pantry/edit/<int:item_id>", methods=["GET", "POST"])
+def edit_pantry_item(item_id):
+    item = PantryItem.query.get_or_404(item_id)
+    form = AddPantryItemForm(obj=item)
+
+    if form.validate_on_submit():
+        item.name = form.name.data
+        item.quantity = form.quantity.data
+        item.unit = form.unit.data
+        item.expiry_date = form.expiry_date.data
+        db.session.commit()
+        return redirect(url_for('pantry'))
+    return render_template('edit_pantry_item.html', form=form, item=item, active_page="pantry")
 
 @app.route("/recipes")
 @login_required

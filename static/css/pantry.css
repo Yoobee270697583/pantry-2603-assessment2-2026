@@ -18,3 +18,29 @@
 .pantry-form-field.form-field label {
     color: #222;                   /* darker label for contrast */
 }
+
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: var(--radius-md);
+    color: #666;
+    transition: color 0.2s, background 0.2s;
+}
+
+.btn-icon:hover {
+    background: #f0f0f0;
+    color: #222;
+}
+
+.btn-icon--danger:hover {
+    background: #fff0f0;
+    color: #c0392b;
+}
