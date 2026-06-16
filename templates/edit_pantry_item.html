@@ -33,6 +33,13 @@
         {% endfor %}
     </div>
     <div class="form-field pantry-form-field">
+        {{ form.category.label }}
+        {{ form.category() }}
+        {% for error in form.category.errors %}
+            <span class="form-error">{{ error }}</span>
+        {% endfor %}
+    </div>
+    <div class="form-field pantry-form-field">
         {{ form.expiry_date.label }}
         {{ form.expiry_date }}
         {% for error in form.expiry_date.errors %}

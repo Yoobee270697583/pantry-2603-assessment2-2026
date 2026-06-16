@@ -63,6 +63,12 @@ class PantryItem(db.Model):
         nullable=False
     )
 
+    # Item category
+    category = db.Column(
+        db.String(100),
+        nullable = False
+    )
+
     # Amount currently owned
     quantity = db.Column(
         db.Float, 
@@ -71,7 +77,8 @@ class PantryItem(db.Model):
 
     # Unit of measurement (kg, g, L, mL etc)
     unit = db.Column(
-        db.String(50)
+        db.String(50),
+        nullable=False
     )
 
     # Optional expiry date
