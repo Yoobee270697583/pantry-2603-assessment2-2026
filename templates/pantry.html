@@ -12,6 +12,45 @@
     <a class="btn-primary" href="/add_pantry_item">+ Add Pantry Item</a>
 </div>
 
+<div class="toolbar">
+    <form action="{{ url_for('pantry') }}" method="GET" class="search-form">
+        <input
+            type="text"
+            name="q"
+            class="search-input"
+            placeholder="Search pantry items..."
+            value="{{ search_query }}"
+        >
+        <button type="submit" class="btn-search">Search</button>
+    </form>
+
+    {% if search_query %}
+        <a href="{{ url_for('pantry') }}" class="btn-secondary">Clear Search</a>
+    {% endif %}
+</div>
+<div class="filter-bar">
+    <form action="{{ url_for('pantry') }}" method="GET">
+        {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+        {% endif %}
+
+        <select name="category" class="filter-select" onchange="this.form.submit()">
+            <option value="">Filter by category</option>
+
+            {% for value, label in category_choices %}
+                {% if value %}
+                    <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if search_query or selected_category %}
+        <a href="{{ url_for('pantry') }}" class="filter-clear">Clear filter</a>
+    {% endif %}
+</div>
 {% if pantry_items %}
 <table class="pantry-table">
     <thead>

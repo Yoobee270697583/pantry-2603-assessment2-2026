@@ -48,3 +48,15 @@
     background: #fff0f0;
     color: #c0392b;
 }
+
+.pantry-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.pantry-toolbar .search-form {
+    flex: 1;
+    margin: 0;
+}

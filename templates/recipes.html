@@ -35,7 +35,7 @@
      ================================================ -->
 {% if active_tab == 'search' %}
 
-    <div class="recipes-toolbar">
+    <div class="toolbar">
         <form action="{{ url_for('recipes') }}" method="GET" class="search-form">
             <input type="hidden" name="tab" value="search">
             <input
@@ -48,7 +48,7 @@
             <button type="submit" class="btn-search">Search</button>
         </form>
 
-        <a href="{{ url_for('recipe_random') }}" class="btn-random">Random Recipe</a>
+        <a href="{{ url_for('recipe_random') }}" class="btn-secondary">Random Recipe</a>
     </div>
 
     <!-- category and area filter dropdowns -->

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
 from models import db, User, Recipe, RecipeIngredient, PantryItem
+from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -112,9 +113,31 @@ def kitchen():
 @app.route("/pantry")
 @login_required
 def pantry():
-    pantry_items = PantryItem.query.filter_by(owner=current_user).all()
+    search_query = request.args.get("q", "").strip()
+    selected_category = request.args.get("category", "").strip()
+
+    query = PantryItem.query.filter_by(owner=current_user)
+
+    if search_query:
+        query = query.filter(PantryItem.name.ilike(f"%{search_query}%"))
+
+    if selected_category:
+        query = query.filter(PantryItem.category == selected_category)
+
+    pantry_items = query.all()
+
     deleteForm = DeletePantryItemForm()
-    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items, form=deleteForm)
+
+    return render_template(
+        "pantry.html",
+        active_page="pantry",
+        pantry_items=pantry_items,
+        form=deleteForm,
+        search_query=search_query,
+        selected_category=selected_category,
+        selected_category_label=CATEGORY_LABELS.get(selected_category, selected_category),
+        category_choices=PANTRY_CATEGORY_CHOICES
+    )
 
 @app.route("/add_pantry_item", methods=['GET', 'POST'])
 @login_required
