@@ -121,7 +121,13 @@ def pantry():
 def add_pantry_item():
     form = AddPantryItemForm()
     if form.validate_on_submit():
-        new_pantry_item = PantryItem(name=form.name.data, quantity=form.quantity.data, unit=form.unit.data, expiry_date = form.expiry_date.data ,owner=current_user)
+        new_pantry_item = PantryItem(
+            name=form.name.data, 
+            quantity=form.quantity.data,
+            category=form.category.data,
+            unit=form.unit.data, 
+            expiry_date = form.expiry_date.data,
+            owner=current_user)
         try:
             db.session.add(new_pantry_item)
             db.session.commit()
@@ -130,6 +136,8 @@ def add_pantry_item():
         except Exception:
             db.session.rollback()
             # flash('Something went wrong adding the pantry item. Please try again.', 'error')
+    else:
+        print("FORM ERRORS:", form.errors)
     return render_template("add_pantry_item.html", form=form, active_page="pantry")
 
 @app.route("/pantry/delete/<int:item_id>", methods=["POST"])
