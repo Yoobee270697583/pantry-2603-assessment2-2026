@@ -51,3 +51,6 @@ class AddPantryItemForm(FlaskForm):
     unit = StringField(validators=[InputRequired(), Length(min=1, max=50)])
     expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add Item')
+
+class DeletePantryItemForm(FlaskForm):
+    pass

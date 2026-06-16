@@ -3,7 +3,7 @@ from models import db, User, Recipe, RecipeIngredient, PantryItem
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegisterForm, CustomRecipeForm, AddPantryItemForm
+from forms import LoginForm, RegisterForm, CustomRecipeForm, AddPantryItemForm, DeletePantryItemForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -113,7 +113,8 @@ def kitchen():
 @login_required
 def pantry():
     pantry_items = PantryItem.query.filter_by(owner=current_user).all()
-    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items)
+    deleteForm = DeletePantryItemForm()
+    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items, form=deleteForm)
 
 @app.route("/add_pantry_item", methods=['GET', 'POST'])
 @login_required
