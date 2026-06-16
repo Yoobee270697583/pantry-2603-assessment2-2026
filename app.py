@@ -111,13 +111,11 @@ def kitchen():
     return render_template("kitchen.html", active_page="kitchen")
 
 # Pantry functionalities
-# Pantry functionalities
 @app.route("/pantry")
 @login_required
 def pantry():
     pantry_items = PantryItem.query.filter_by(owner=current_user).all()
     deleteForm = DeletePantryItemForm()
-    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items, form=deleteForm)
     search_query = request.args.get("q", "").strip()
     selected_category = request.args.get("category", "").strip()
 
@@ -167,27 +165,6 @@ def add_pantry_item():
     else:
         print("FORM ERRORS:", form.errors)
     return render_template("add_pantry_item.html", form=form, active_page="pantry")
-
-@app.route("/pantry/delete/<int:item_id>", methods=["POST"])
-def delete_pantry_item(item_id):
-    item = PantryItem.query.get_or_404(item_id)
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for("pantry"))
-
-@app.route("/pantry/edit/<int:item_id>", methods=["GET", "POST"])
-def edit_pantry_item(item_id):
-    item = PantryItem.query.get_or_404(item_id)
-    form = AddPantryItemForm(obj=item)
-
-    if form.validate_on_submit():
-        item.name = form.name.data
-        item.quantity = form.quantity.data
-        item.unit = form.unit.data
-        item.expiry_date = form.expiry_date.data
-        db.session.commit()
-        return redirect(url_for('pantry'))
-    return render_template('edit_pantry_item.html', form=form, item=item, active_page="pantry")
 
 @app.route("/pantry/delete/<int:item_id>", methods=["POST"])
 def delete_pantry_item(item_id):
