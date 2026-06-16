@@ -13,3 +13,19 @@ PANTRY_CATEGORY_CHOICES = [
 ]
 
 CATEGORY_LABELS = dict(PANTRY_CATEGORY_CHOICES)
+
+PANTRY_UNIT_CHOICES = [
+    ("", "Select a unit"),
+    ("g", "g"),
+    ("kg", "kg"),
+    ("ml", "mL"),
+    ("l", "L"),
+    ("each", "Each"),
+    ("tsp", "tsp"),
+    ("tbsp", "tbsp"),
+    ("cup", "Cup"),
+    ("can", "Can"),
+    ("other", "Other"),
+]
+
+UNIT_LABELS = dict(PANTRY_UNIT_CHOICES)
