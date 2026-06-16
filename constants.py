@@ -1,4 +1,4 @@
-pantry_category_choices = [
+PANTRY_CATEGORY_CHOICES = [
     ("", "Select a category"),
     ("fruit_veg", "Fruit & Vegetables"),
     ("meat_seafood", "Meat & Seafood"),
@@ -11,3 +11,5 @@ pantry_category_choices = [
     ("drinks", "Drinks"),
     ("other", "Other"),
 ]
+
+CATEGORY_LABELS = dict(PANTRY_CATEGORY_CHOICES)
