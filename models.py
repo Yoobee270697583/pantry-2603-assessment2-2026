@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from constants import CATEGORY_LABELS
 
 # Database instance
 db = SQLAlchemy()
@@ -92,6 +93,11 @@ class PantryItem(db.Model):
         db.ForeignKey("user.id"), 
         nullable=False
     )
+
+    @property
+    def category_label(self):
+        """Returns the display label for the stored category value."""
+        return CATEGORY_LABELS.get(self.category, self.category)
 
 class RecipeIngredient(db.Model):
     """
