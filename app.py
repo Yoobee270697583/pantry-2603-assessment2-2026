@@ -5,7 +5,6 @@ from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
-from forms import LoginForm, RegisterForm, CustomRecipeForm, AddPantryItemForm, DeletePantryItemForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
