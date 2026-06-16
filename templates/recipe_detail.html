@@ -1,19 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}{{ meal.strMeal }} — Pantry{% endblock %}
+
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
 {% endblock %}
-{% block content %}
 
-<!-- flash messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <p class="flash flash-{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+{% block content %}
 
 <a href="{{ url_for('recipes', tab='search') }}" class="back-link">← back to recipes</a>
 
@@ -27,7 +20,6 @@
         </p>
 
         <div class="recipe-actions">
-            <!-- save button changes state if already saved -->
             {% if is_saved %}
                 <span class="btn-saved">✓ Saved</span>
             {% else %}
@@ -36,7 +28,6 @@
                 </form>
             {% endif %}
 
-            <!-- only show if the api returned a youtube link -->
             {% if meal.strYoutube %}
                 <a href="{{ meal.strYoutube }}" target="_blank" class="btn-youtube">▶ watch on youtube</a>
             {% endif %}
@@ -58,7 +49,6 @@
 
 <section class="recipe-section">
     <h2>Instructions</h2>
-    <!-- pre-line keeps the line breaks from the api -->
     <div class="instructions">
         {{ meal.strInstructions }}
     </div>

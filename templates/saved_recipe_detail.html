@@ -25,9 +25,12 @@
             <span class="tag tag-source">{{ recipe.source }}</span>
         </p>
 
-        {% if recipe.youtube_url %}
-            <a href="{{ recipe.youtube_url }}" target="_blank" class="btn-youtube">▶ watch on youtube</a>
-        {% endif %}
+        <div class="recipe-actions">
+            <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Edit Recipe</a>
+            {% if recipe.youtube_url %}
+                <a href="{{ recipe.youtube_url }}" target="_blank" class="btn-youtube">▶ watch on youtube</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Create Recipe — Pantry{% endblock %}
+{% block title %}Edit {{ recipe.name }} — Pantry{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
@@ -8,16 +8,16 @@
 
 {% block content %}
 
-<a href="{{ url_for('recipes', tab='created') }}" class="back-link">← back to my recipes</a>
+<a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="back-link">← back to recipe</a>
 
-<h1>Create a Recipe</h1>
+<h1>Edit Recipe</h1>
 
-<form action="{{ url_for('create_recipe') }}" method="POST" class="recipe-form">
+<form action="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" method="POST" class="recipe-form">
     {{ form.hidden_tag() }}
 
     <div class="form-field">
         <label for="name">Recipe Name *</label>
-        {{ form.name(id="name", class="form-input", placeholder="e.g. Grandma's Pasta") }}
+        {{ form.name(id="name", class="form-input") }}
         {% if form.name.errors %}
             <p class="form-error">{{ form.name.errors[0] }}</p>
         {% endif %}
@@ -26,26 +26,31 @@
     <div class="form-row">
         <div class="form-field">
             <label for="category">Category</label>
-            {{ form.category(id="category", class="form-input", placeholder="e.g. Pasta, Dessert") }}
+            {{ form.category(id="category", class="form-input") }}
         </div>
         <div class="form-field">
             <label for="area">Cuisine</label>
-            {{ form.area(id="area", class="form-input", placeholder="e.g. Italian, Japanese") }}
+            {{ form.area(id="area", class="form-input") }}
         </div>
     </div>
 
     <div class="form-field">
         <label for="image_url">Image URL</label>
         <p class="form-hint">paste a link to an image of the recipe</p>
-        {{ form.image_url(id="image_url", class="form-input", placeholder="https://...") }}
-        <img id="img-preview" src="" alt="image preview" class="img-preview" style="display:none">
+        {{ form.image_url(id="image_url", class="form-input") }}
+        <img
+            id="img-preview"
+            src="{{ recipe.image_url or '' }}"
+            alt="image preview"
+            class="img-preview"
+            style="{{ 'display:block' if recipe.image_url else 'display:none' }}"
+        >
     </div>
 
     <div class="form-field">
         <label for="ingredients">Ingredients *</label>
         <p class="form-hint">one per line — format: amount, ingredient name</p>
-        <p class="form-hint">e.g. "2 cups, flour" or just "salt"</p>
-        {{ form.ingredients(id="ingredients", class="form-textarea", rows=10, placeholder="2 cups, flour\n1 tsp, salt\n3, eggs") }}
+        {{ form.ingredients(id="ingredients", class="form-textarea", rows=10) }}
         {% if form.ingredients.errors %}
             <p class="form-error">{{ form.ingredients.errors[0] }}</p>
         {% endif %}
@@ -53,13 +58,13 @@
 
     <div class="form-field">
         <label for="instructions">Instructions *</label>
-        {{ form.instructions(id="instructions", class="form-textarea", rows=12, placeholder="Step 1: ...") }}
+        {{ form.instructions(id="instructions", class="form-textarea", rows=12) }}
         {% if form.instructions.errors %}
             <p class="form-error">{{ form.instructions.errors[0] }}</p>
         {% endif %}
     </div>
 
-    <button type="submit" class="btn-submit">Save Recipe</button>
+    <button type="submit" class="btn-submit">Save Changes</button>
 </form>
 
 <script>

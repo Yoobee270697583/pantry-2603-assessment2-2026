@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField
-from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
+from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Regexp, Optional
 from models import User
 
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
@@ -30,18 +30,7 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
     submit = SubmitField('Login')
 
-
-# form for creating a custom recipe
-class CustomRecipeForm(FlaskForm):
-    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
-    category = StringField(validators=[Optional(), Length(max=100)])
-    area = StringField(validators=[Optional(), Length(max=100)])
-    # one ingredient per line, format: "amount, ingredient name"
-    ingredients = TextAreaField(validators=[InputRequired()])
-    instructions = TextAreaField(validators=[InputRequired()])
-    submit = SubmitField('Save Recipe')
-
-# Add Pantry Item Form
+    # Add Pantry Item Form
 class AddPantryItemForm(FlaskForm):
     # Pantry item name
     name = StringField(validators=[InputRequired(), Length(min=1, max=150)])
@@ -51,3 +40,25 @@ class AddPantryItemForm(FlaskForm):
     unit = StringField(validators=[InputRequired(), Length(min=1, max=50)])
     expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add Item')
+
+
+    # form for creating a custom recipe
+class CustomRecipeForm(FlaskForm):
+    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
+    category = StringField(validators=[Optional(), Length(max=100)])
+    area = StringField(validators=[Optional(), Length(max=100)])
+    # one ingredient per line, format: "amount, ingredient name"
+    ingredients = TextAreaField(validators=[InputRequired()])
+    instructions = TextAreaField(validators=[InputRequired()])
+    submit = SubmitField('Save Recipe')
+
+
+# form for editing an existing saved recipe
+class EditRecipeForm(FlaskForm):
+    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
+    category = StringField(validators=[Optional(), Length(max=100)])
+    area = StringField(validators=[Optional(), Length(max=100)])
+    image_url = StringField(validators=[Optional(), Length(max=500)])
+    ingredients = TextAreaField(validators=[InputRequired()])
+    instructions = TextAreaField(validators=[InputRequired()])
+    submit = SubmitField('Save Changes')
