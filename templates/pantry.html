@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block title %}My Pantry — Pantry{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pantry.css') }}">
+{% endblock %}
+
 
 {% block content %}
 <div class="page-header">
@@ -16,6 +20,7 @@
             <th>Quantity</th>
             <th>Unit</th>
             <th>Expiry Date</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +30,19 @@
             <td>{{ item.quantity }}</td>
             <td>{{ item.unit }}</td>
             <td>{{ item.expiry_date }}</td>
+            <td>
+                <div class="item-actions">
+                    <!-- <a href="/pantry/edit/{{ item.id }}" class="btn-icon">
+                        <i class="fa-solid fa-pencil"></i>
+                    </a> -->
+                    <form method="POST" action="/pantry/delete/{{ item.id }}">
+                        {{ form.hidden_tag() }}
+                        <button type="submit" class="btn-icon btn-icon--danger">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
