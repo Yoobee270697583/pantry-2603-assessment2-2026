@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from constants import CATEGORY_LABELS
+from constants import CATEGORY_LABELS, UNIT_LABELS
 
 # Database instance
 db = SQLAlchemy()
@@ -98,6 +98,11 @@ class PantryItem(db.Model):
     def category_label(self):
         """Returns the display label for the stored category value."""
         return CATEGORY_LABELS.get(self.category, self.category)
+    
+    @property
+    def unit_label(self):
+        """Returns the display label for the stored unit value."""
+        return UNIT_LABELS.get(self.unit, self.unit)
 
 class RecipeIngredient(db.Model):
     """
