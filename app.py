@@ -259,8 +259,6 @@ def recipe_detail(meal_id):
         meal=meal,
         ingredients=ingredients,
         is_saved=is_saved
-        ingredients=ingredients,
-        is_saved=is_saved
     )
 
 
