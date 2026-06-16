@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from models import db, User, Recipe, RecipeIngredient
+from models import db, User, Recipe, RecipeIngredient, PantryItem
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegisterForm, CustomRecipeForm, EditRecipeForm
+from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -112,8 +112,24 @@ def kitchen():
 @app.route("/pantry")
 @login_required
 def pantry():
-    return render_template("pantry.html", active_page="pantry")
+    pantry_items = PantryItem.query.filter_by(owner=current_user).all()
+    return render_template("pantry.html", active_page="pantry", pantry_items=pantry_items)
 
+@app.route("/add_pantry_item", methods=['GET', 'POST'])
+@login_required
+def add_pantry_item():
+    form = AddPantryItemForm()
+    if form.validate_on_submit():
+        new_pantry_item = PantryItem(name=form.name.data, quantity=form.quantity.data, unit=form.unit.data, expiry_date = form.expiry_date.data ,owner=current_user)
+        try:
+            db.session.add(new_pantry_item)
+            db.session.commit()
+            # flash('Pantry item added successfully.')
+            return redirect(url_for('pantry'))  # redirect after success
+        except Exception:
+            db.session.rollback()
+            # flash('Something went wrong adding the pantry item. Please try again.', 'error')
+    return render_template("add_pantry_item.html", form=form, active_page="pantry")
 
 @app.route("/recipes")
 @login_required
@@ -231,10 +247,18 @@ def recipe_detail(meal_id):
         mealdb_id=meal_id
     ).first() is not None
 
+    # check if the user has already saved this recipe
+    is_saved = Recipe.query.filter_by(
+        user_id=current_user.id,
+        mealdb_id=meal_id
+    ).first() is not None
+
     return render_template(
         "recipe_detail.html",
         active_page="recipes",
         meal=meal,
+        ingredients=ingredients,
+        is_saved=is_saved
         ingredients=ingredients,
         is_saved=is_saved
     )

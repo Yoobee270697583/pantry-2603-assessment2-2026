@@ -90,6 +90,7 @@
     display: block;
 }
 
+/* shown when a saved recipe has no image */
 .recipe-card-no-img {
     width: 100%;
     aspect-ratio: 1;
@@ -122,6 +123,10 @@
     color: #aab4ad;
 }
 
+.recipe-card-source {
+    font-size: 0.75rem;
+    color: #aab4ad;
+}
 
 /* ---- recipe detail ---- */
 
@@ -149,6 +154,18 @@
     height: 260px;
     object-fit: cover;
     border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.recipe-hero-placeholder {
+    width: 260px;
+    height: 260px;
+    background: #f0f4f1;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    color: #6b7a6e;
     flex-shrink: 0;
 }
 
@@ -544,6 +561,11 @@
 
     .recipes-toolbar .search-form {
         flex: 1 1 100%;
+    }
+
+    .btn-random {
+        width: 100%;
+        text-align: center;
     }
 
     .search-form {
