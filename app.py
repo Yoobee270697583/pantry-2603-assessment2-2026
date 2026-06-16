@@ -131,6 +131,13 @@ def add_pantry_item():
             # flash('Something went wrong adding the pantry item. Please try again.', 'error')
     return render_template("add_pantry_item.html", form=form, active_page="pantry")
 
+@app.route("/pantry/delete/<int:item_id>", methods=["POST"])
+def delete_pantry_item(item_id):
+    item = PantryItem.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for("pantry"))
+
 @app.route("/recipes")
 @login_required
 def recipes():
