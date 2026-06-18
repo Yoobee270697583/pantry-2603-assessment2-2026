@@ -371,8 +371,63 @@ select {
         flex-direction: column;
     }
 
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .btn-secondary {
         width: 100%;
         text-align: center;
+    }
+
+    /* filter bar wraps and each filter takes full width on small screens */
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    /* page header stacks instead of squeezing side by side */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .page-header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    /* tab bar: allow horizontal scroll but shrink padding so more tabs fit */
+    .tab {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* table needs horizontal scroll on narrow screens rather than squashing columns */
+    .pantry-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* tighter breakpoint for very small phones */
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .btn-rounded {
+        width: 100%;
+        justify-content: center;
     }
 }
