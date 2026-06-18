@@ -172,3 +172,41 @@ def get_ingredients(meal):
             })
 
     return ingredients
+
+def search_ingredients(search_term):
+    try:
+        url = BASE_URL + "list.php"
+        response = requests.get(url, params={"i": "list"}, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return []
+
+        all_ingredients = data["meals"]
+
+        search_term_lower = search_term.lower()
+        matches = [
+            ing for ing in all_ingredients
+            if search_term_lower in ing["strIngredient"].lower()
+        ]
+
+        # build the thumbnail url for each match
+        for ing in matches:
+            name_for_url = ing["strIngredient"].replace(" ", "_")
+            ing["image_url"] = f"https://www.themealdb.com/images/ingredients/{name_for_url}-small.png"
+
+        return matches
+
+    except requests.exceptions.ConnectionError:
+        print("no internet connection")
+        return []
+
+    except requests.exceptions.Timeout:
+        print("request timed out")
+        return []
+
+    except Exception as error:
+        print(f"something went wrong: {error}")
+        return []
