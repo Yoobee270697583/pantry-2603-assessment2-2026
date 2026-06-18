@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
 from models import db, User, Recipe, RecipeIngredient, PantryItem
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
-from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
+from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area, search_ingredients
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
@@ -113,32 +113,52 @@ def kitchen():
 @app.route("/pantry")
 @login_required
 def pantry():
-    pantry_items = PantryItem.query.filter_by(owner=current_user).all()
-    deleteForm = DeletePantryItemForm()
-    search_query = request.args.get("q", "").strip()
-    selected_category = request.args.get("category", "").strip()
+    active_tab = request.args.get("tab", "pantry")
+    pantry_items = []
+    search_query = ""
+    selected_category = ""
 
-    query = PantryItem.query.filter_by(owner=current_user)
+    api_ingredients = []
+    ingredient_search_query = ""
+    ingredient_error = ""
 
-    if search_query:
-        query = query.filter(PantryItem.name.ilike(f"%{search_query}%"))
+    delete_form = DeletePantryItemForm()
 
-    if selected_category:
-        query = query.filter(PantryItem.category == selected_category)
+    if active_tab == "pantry":
+        search_query = request.args.get("q", "").strip()
+        selected_category = request.args.get("category", "").strip()
 
-    pantry_items = query.all()
+        query = PantryItem.query.filter_by(owner=current_user)
 
-    deleteForm = DeletePantryItemForm()
+        if search_query:
+            query = query.filter(PantryItem.name.ilike(f"%{search_query}%"))
+
+        if selected_category:
+            query = query.filter(PantryItem.category == selected_category)
+
+        pantry_items = query.all()
+
+    elif active_tab == "ingredients":
+        ingredient_search_query = request.args.get("q", "").strip()
+
+        if ingredient_search_query:
+            api_ingredients = search_ingredients(ingredient_search_query)
+            if len(api_ingredients) == 0:
+                ingredient_error = f"no ingredients found for '{ingredient_search_query}'"
 
     return render_template(
         "pantry.html",
         active_page="pantry",
+        active_tab=active_tab,
         pantry_items=pantry_items,
-        form=deleteForm,
+        form=delete_form,
         search_query=search_query,
         selected_category=selected_category,
         selected_category_label=CATEGORY_LABELS.get(selected_category, selected_category),
-        category_choices=PANTRY_CATEGORY_CHOICES
+        category_choices=PANTRY_CATEGORY_CHOICES,
+        api_ingredients=api_ingredients,
+        ingredient_search_query=ingredient_search_query,
+        ingredient_error=ingredient_error,
     )
 
 @app.route("/add_pantry_item", methods=['GET', 'POST'])
