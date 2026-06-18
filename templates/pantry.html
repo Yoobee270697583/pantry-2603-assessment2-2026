@@ -130,16 +130,16 @@
     {% endif %}
 
     {% if api_ingredients %}
-        <div class="recipe-grid">
+        <div class="grid">
             {% for ing in api_ingredients %}
-            <div class="recipe-card">
+            <div class="card">
                 {% if ing.image_url %}
-                    <img src="{{ ing.image_url }}" alt="{{ ing.strIngredient }}" class="recipe-card-img" onerror="handleImageError(this)">
+                    <img src="{{ ing.image_url }}" alt="{{ ing.strIngredient }}" class="card-img" onerror="handleImageError(this)">
                 {% else %}
-                    <div class="recipe-card-no-img">No Image</div>
+                    <div class="card-no-img">No Image</div>
                 {% endif %}
-                <div class="recipe-card-body">
-                    <h3 class="recipe-card-title">{{ ing.strIngredient }}</h3>
+                <div class="card-body">
+                    <h3 class="card-title">{{ ing.strIngredient }}</h3>
                 </div>
             </div>
             {% endfor %}
@@ -152,7 +152,7 @@
     function handleImageError(img) {
         img.onerror = null;
         const placeholder = document.createElement('div');
-        placeholder.className = 'recipe-card-no-img';
+        placeholder.className = 'card-no-img';
         placeholder.textContent = 'No Image';
         img.replaceWith(placeholder);
     }

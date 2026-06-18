@@ -250,13 +250,13 @@ select {
     color: #1f2421;
 }
 
-.recipe-grid {
+.grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
 }
 
-.recipe-card {
+.card {
     display: block;
     border-radius: 10px;
     overflow: hidden;
@@ -267,23 +267,23 @@ select {
     transition: box-shadow 0.2s, transform 0.2s;
 }
 
-.recipe-card-body {
+.card-body {
     padding: 12px;
 }
 
-.recipe-card-title {
+.card-title {
     font-size: 0.95rem;
     font-weight: 600;
     margin-bottom: 4px;
     color: #1f2421;
 }
 
-.recipe-card:hover {
+.card:hover {
     box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     transform: translateY(-2px);
 }
 
-.recipe-card-img {
+.card-img {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
@@ -291,7 +291,7 @@ select {
 }
 
 /* shown when a saved recipe has no image */
-.recipe-card-no-img {
+.card-no-img {
     width: 100%;
     aspect-ratio: 1;
     background: #f0f4f1;
@@ -299,6 +299,17 @@ select {
     place-items: center;
     font-size: 0.85rem;
     color: #6b7a6e;
+}
+
+.card-meta {
+    font-size: 0.8rem;
+    color: #6b7a6e;
+    margin-bottom: 4px;
+}
+
+.card-source {
+    font-size: 0.75rem;
+    color: #aab4ad;
 }
 
 /* ---- tab bar ---- */

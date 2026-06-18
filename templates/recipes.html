@@ -65,20 +65,20 @@
 
     {% if saved_recipes %}
         <p class="results-count">{{ saved_recipes | length }} recipe(s)</p>
-        <div class="recipe-grid">
+        <div class="grid">
             {% for recipe in saved_recipes %}
-            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
+            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
                 {% if recipe.image_url %}
-                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="recipe-card-img">
+                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
                 {% else %}
-                    <div class="recipe-card-no-img">No Image</div>
+                    <div class="card-no-img">No Image</div>
                 {% endif %}
-                <div class="recipe-card-body">
-                    <h3 class="recipe-card-title">{{ recipe.name }}</h3>
+                <div class="card-body">
+                    <h3 class="card-title">{{ recipe.name }}</h3>
                     {% if recipe.category or recipe.area %}
-                        <p class="recipe-card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                        <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
                     {% endif %}
-                    <p class="recipe-card-source">{{ recipe.source }}</p>
+                    <p class="card-source">{{ recipe.source }}</p>
                 </div>
             </a>
             {% endfor %}
@@ -152,14 +152,14 @@
             {% if selected_area %}from {{ selected_area }} cuisine{% endif %}
         </p>
 
-        <div class="recipe-grid">
+        <div class="grid">
             {% for meal in api_results %}
-            <a href="{{ url_for('recipe_detail', meal_id=meal.idMeal) }}" class="recipe-card">
-                <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="recipe-card-img">
-                <div class="recipe-card-body">
-                    <h3 class="recipe-card-title">{{ meal.strMeal }}</h3>
+            <a href="{{ url_for('recipe_detail', meal_id=meal.idMeal) }}" class="card">
+                <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="card-img">
+                <div class="card-body">
+                    <h3 class="card-title">{{ meal.strMeal }}</h3>
                     {% if meal.strCategory or meal.strArea %}
-                        <p class="recipe-card-meta">{{ meal.strCategory }}{% if meal.strCategory and meal.strArea %} · {% endif %}{{ meal.strArea }}</p>
+                        <p class="card-meta">{{ meal.strCategory }}{% if meal.strCategory and meal.strArea %} · {% endif %}{{ meal.strArea }}</p>
                     {% endif %}
                 </div>
             </a>
@@ -177,24 +177,24 @@
 {% elif active_tab == 'created' %}
 
     {% if created_recipes %}
-        <div class="recipe-grid">
+        <div class="grid">
             {% for recipe in created_recipes %}
-            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="recipe-card">
+            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
                 {% if recipe.image_url %}
-                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="recipe-card-img">
+                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
                 {% else %}
-                    <div class="recipe-card-no-img">No Image</div>
+                    <div class="card-no-img">No Image</div>
                 {% endif %}
-                <div class="recipe-card-body">
-                    <h3 class="recipe-card-title">{{ recipe.name }}</h3>
+                <div class="card-body">
+                    <h3 class="card-title">{{ recipe.name }}</h3>
                     {% if recipe.category or recipe.area %}
-                        <p class="recipe-card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                        <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
                     {% endif %}
                     <!-- show a badge if this recipe belongs to the current user -->
                     {% if recipe.user_id == current_user.id %}
-                        <p class="recipe-card-source">Your recipe</p>
+                        <p class="card-source">Your recipe</p>
                     {% else %}
-                        <p class="recipe-card-source">Community</p>
+                        <p class="card-source">Community</p>
                     {% endif %}
                 </div>
             </a>
