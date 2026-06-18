@@ -54,7 +54,7 @@ select {
     cursor: pointer;
 }
 
-.pantry-table {
+table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -66,11 +66,11 @@ select {
     color: var(--text);
 }
 
-.pantry-table thead tr {
+table thead tr {
     background: var(--surface-soft);
 }
 
-.pantry-table th {
+table th {
     text-align: left;
     padding: 12px 16px;
     font-weight: 600;
@@ -81,16 +81,16 @@ select {
     border-bottom: 1px solid var(--border);
 }
 
-.pantry-table td {
+table td {
     padding: 13px 16px;
     border-bottom: 1px solid var(--border);
 }
 
-.pantry-table tbody tr:last-child td {
+table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.pantry-table tbody tr:hover td {
+table tbody tr:hover td {
     background: #f0faf6;
 }
 
@@ -409,7 +409,7 @@ select {
     }
 
     /* table needs horizontal scroll on narrow screens rather than squashing columns */
-    .pantry-table {
+    table {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
