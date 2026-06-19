@@ -299,12 +299,6 @@ def recipe_detail(meal_id):
         mealdb_id=meal_id
     ).first() is not None
 
-    # check if the user has already saved this recipe
-    is_saved = Recipe.query.filter_by(
-        user_id=current_user.id,
-        mealdb_id=meal_id
-    ).first() is not None
-
     return render_template(
         "recipe_detail.html",
         active_page="recipes",
