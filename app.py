@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
-from models import db, User, Recipe, RecipeIngredient, PantryItem
+from flask import Flask, request, render_template, redirect, flash, url_for
+from datetime import date
+from models import User, Recipe, MealPlan, RecipeIngredient, PantryItem, db
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
-from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area
-from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
 
@@ -99,11 +100,6 @@ def register():
     return render_template("register.html", form=form)
 
 
-# @app.route("/register_success")
-# def register_success():
-#     return render_template("register_success.html")
-
-
 @app.route("/kitchen")
 @login_required
 def kitchen():
@@ -185,6 +181,7 @@ def edit_pantry_item(item_id):
         db.session.commit()
         return redirect(url_for('pantry'))
     return render_template('edit_pantry_item.html', form=form, item=item, active_page="pantry")
+
 
 @app.route("/recipes")
 @login_required
@@ -476,7 +473,42 @@ def suggestions():
 @app.route("/planned")
 @login_required
 def planned():
-    return render_template("planned.html", active_page="planned")
+    #retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
+    meal_plans = MealPlan.query.filter_by(user_id=current_user.id).order_by(MealPlan.id.asc()).all()
+    
+    #get and store the recipe data including img, all metadata - because it's not in the MealPlan model
+    planned_meals = []
+    
+    for meal in meal_plans:
+        recipe = Recipe.query.get(meal.recipe_id)
+        #put the retrieved meal_plans and recipes together into one variable     
+        planned_meals.append({"plan": meal, "recipe": recipe})
+        
+    return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
+    
+    
+@app.route("/planned/add_to_plan/<int:recipe_id>", methods=['POST'])
+@login_required
+def add_to_plan(recipe_id):
+    planned_meal = MealPlan(planned_date=date.today(), user_id=current_user.id, recipe_id=recipe_id)
+    try:
+        db.session.add(planned_meal)
+        db.session.commit()
+        flash('Recipe successfully added to planned meals!')
+        return redirect(url_for('planned'))
+    except Exception:
+        db.session.rollback()
+        flash('Something went wrong adding the recipe to planned meals. Please try again.', 'error')
+
+    return redirect("planned.html")
+
+@app.route("/planned/delete/<int:item_id>", methods=['POST'])
+@login_required
+def delete_planned_meal(item_id):
+    item = MealPlan.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for("planned"))
 
 
 @app.route("/cooked")
