@@ -23,6 +23,22 @@
     color: #222;                   /* darker label for contrast */
 }
 
+.ingredient-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.ingredient-card .card-title {
+    margin-bottom: 0;
+}
+
+.ingredient-card-action {
+    align-self: flex-start;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.9rem;
+}
+
 .item-actions {
     display: flex;
     align-items: center;

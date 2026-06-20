@@ -9,7 +9,7 @@
 <div class="page-header">
     <h1>My Pantry</h1>
     <div class="page-header-actions">
-        <a href="{{ url_for('add_pantry_item') }}" class="btn-rounded">+ Add Pantry Item</a>
+        <a href="{{ url_for('pantry', tab='ingredients') }}" class="btn-rounded">+ Add Pantry Item</a>
     </div>
 </div>
 <!-- <div class="page-header">
@@ -83,7 +83,7 @@
         <tbody>
             {% for item in pantry_items %}
             <tr>
-                <td>{{ item.name }}</td>
+                <td>{{ item.ingredient.name }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>{{ item.unit }}</td>
                 <td>{{ item.category_label }}</td>
@@ -132,14 +132,15 @@
     {% if api_ingredients %}
         <div class="grid">
             {% for ing in api_ingredients %}
-            <div class="card">
+            <div class="card ingredient-card">
                 {% if ing.image_url %}
-                    <img src="{{ ing.image_url }}" alt="{{ ing.strIngredient }}" class="card-img" onerror="handleImageError(this)">
+                    <img src="{{ ing.image_url }}" alt="{{ ing.name }}" class="card-img" onerror="handleImageError(this)">
                 {% else %}
                     <div class="card-no-img">No Image</div>
                 {% endif %}
                 <div class="card-body">
-                    <h3 class="card-title">{{ ing.strIngredient }}</h3>
+                    <h3 class="card-title">{{ ing.name }}</h3>
+                    <a href="{{ url_for('add_pantry_item', ingredient_id=ing.id) }}" class="btn-secondary ingredient-card-action">+ Add to Pantry</a>
                 </div>
             </div>
             {% endfor %}
