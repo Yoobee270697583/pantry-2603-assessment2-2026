@@ -62,6 +62,43 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# This is a helper function to check if a MealDB recipe exists in our own database, and adds it if it doesn't.
+def get_or_create_recipe(user_id, meal_id):
+    
+    existing = Recipe.query.filter_by(user_id=user_id, mealdb_id=meal_id).first()
+
+    if existing:
+        return existing
+
+    meal = get_recipe_by_id(meal_id)
+
+    if meal is None:
+        return None
+
+    new_recipe = Recipe(
+        mealdb_id=meal["idMeal"],
+        name=meal["strMeal"],
+        category=meal.get("strCategory", ""),
+        area=meal.get("strArea", ""),
+        instructions=meal.get("strInstructions", ""),
+        image_url=meal.get("strMealThumb", ""),
+        youtube_url=meal.get("strYoutube", ""),
+        source="TheMealDB",
+        user_id=user_id
+    )
+    db.session.add(new_recipe)
+    db.session.flush()
+
+    # save the ingredients linked to this recipe
+    for item in get_ingredients(meal):
+        ingredient = RecipeIngredient(
+            name=item["name"],
+            amount=item["amount"],
+            recipe_id=new_recipe.id
+        )
+        db.session.add(ingredient)
+        
+    return new_recipe
     
 # Each route below maps a URL to a function that returns a page.
 # render_template() finds the named file in templates/ and renders it,
@@ -311,41 +348,14 @@ def recipe_detail(meal_id):
 @app.route("/recipe/save/<meal_id>", methods=["POST"])
 @login_required
 def save_recipe(meal_id):
-    # check if the user already saved this recipe
-    existing = Recipe.query.filter_by(user_id=current_user.id, mealdb_id=meal_id).first()
-
-    if existing:
-        return redirect(url_for("recipe_detail", meal_id=meal_id))
-
-    meal = get_recipe_by_id(meal_id)
-
-    if meal is None:
+    # check if the user already saved this recipe, and if not, save it
+    recipe = get_or_create_recipe(meal_id, user_id=current_user.id)
+    
+    if recipe is None:
         return redirect(url_for("recipes"))
 
-    new_recipe = Recipe(
-        mealdb_id=meal["idMeal"],
-        name=meal["strMeal"],
-        category=meal.get("strCategory", ""),
-        area=meal.get("strArea", ""),
-        instructions=meal.get("strInstructions", ""),
-        image_url=meal.get("strMealThumb", ""),
-        youtube_url=meal.get("strYoutube", ""),
-        source="TheMealDB",
-        user_id=current_user.id
-    )
-    db.session.add(new_recipe)
-    db.session.flush()
-
-    # save the ingredients linked to this recipe
-    for item in get_ingredients(meal):
-        ingredient = RecipeIngredient(
-            name=item["name"],
-            amount=item["amount"],
-            recipe_id=new_recipe.id
-        )
-        db.session.add(ingredient)
-
     db.session.commit()
+    
     return redirect(url_for("recipe_detail", meal_id=meal_id))
 
 
@@ -481,10 +491,16 @@ def planned():
     return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
     
     
-@app.route("/planned/add_to_plan/<int:recipe_id>", methods=['POST'])
+@app.route("/planned/add_saved_to_plan/<int:recipe_id>", methods=['POST'])
 @login_required
-def add_to_plan(recipe_id):
-    planned_meal = MealPlan(planned_date=date.today(), user_id=current_user.id, recipe_id=recipe_id)
+def add_saved_to_plan(recipe_id):
+    
+    planned_meal = MealPlan(
+        planned_date=date.today(), 
+        user_id=current_user.id, 
+        recipe_id=recipe_id
+        )
+    
     try:
         db.session.add(planned_meal)
         db.session.commit()
@@ -494,7 +510,37 @@ def add_to_plan(recipe_id):
         db.session.rollback()
         flash('Something went wrong adding the recipe to planned meals. Please try again.', 'error')
 
-    return redirect("planned.html")
+    return redirect(url_for('planned'))
+
+
+@app.route("/planned/add_searched_to_plan/<meal_id>", methods=['POST'])
+@login_required
+def add_searched_to_plan(meal_id):
+    # Check the recipe is already in the user's saved meals tab. If not, save it first
+    # Either way, retieve the row for the reciple being added to planned meals, as saved_recipe
+    user_id=current_user.id
+    saved_recipe = get_or_create_recipe(user_id, meal_id)
+    
+    if saved_recipe is None:
+        flash('Could not find that recipe. Please try again.', 'error')
+        return redirect(url_for('recipes', tab='search'))
+    
+    planned_meal = MealPlan(
+        planned_date=date.today(), 
+        user_id=saved_recipe.user_id, 
+        recipe_id=saved_recipe.id
+        )
+    
+    try:
+        db.session.add(planned_meal)
+        db.session.commit()
+        flash('Recipe successfully added to planned meals!')
+    except Exception:
+        db.session.rollback()
+        flash('Something went wrong adding the recipe to planned meals. Please try again.', 'error')
+        
+    return redirect(url_for('planned'))
+    
 
 @app.route("/planned/delete/<int:item_id>", methods=['POST'])
 @login_required
