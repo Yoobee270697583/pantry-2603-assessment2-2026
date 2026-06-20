@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField, SelectField, HiddenField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
-from models import User
+from models import User, Ingredient
 from constants import PANTRY_CATEGORY_CHOICES, PANTRY_UNIT_CHOICES
 
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
@@ -31,18 +31,6 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
     submit = SubmitField('Login')
 
-    # Add Pantry Item Form
-class AddPantryItemForm(FlaskForm):
-    # Pantry item name
-    name = StringField(validators=[InputRequired(), Length(min=1, max=150)])
-    # Pantry Item quantity, using FloatField to allow for decimal quantities (e.g., 1.5 cups)
-    quantity = FloatField(validators=[InputRequired()])
-    # Pantry Item unit, i.e. kg, g, ml, L, cup etc.
-    unit = StringField(validators=[InputRequired(), Length(min=1, max=50)])
-    expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
-    submit = SubmitField('Add Item')
-
-
     # form for creating a custom recipe
 class CustomRecipeForm(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
@@ -55,8 +43,9 @@ class CustomRecipeForm(FlaskForm):
 
 # Add Pantry Item Form
 class AddPantryItemForm(FlaskForm):
-    # Pantry item name
-    name = StringField(validators=[InputRequired(), Length(min=1, max=150)])
+    # Ingredient being added - must reference an existing Ingredient row,
+    # selected from the Ingredients tab rather than typed freely
+    ingredient_id = HiddenField(validators=[InputRequired()])
     # Pantry Item quantity, using FloatField to allow for decimal quantities (e.g., 1.5 cups)
     quantity = FloatField(validators=[InputRequired()])
     # Pantry Item category
@@ -73,6 +62,14 @@ class AddPantryItemForm(FlaskForm):
     )
     expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add Item')
+
+    def validate_ingredient_id(self, ingredient_id):
+        try:
+            ingredient = Ingredient.query.get(int(ingredient_id.data))
+        except (TypeError, ValueError):
+            ingredient = None
+        if ingredient is None:
+            raise ValidationError('Choose an ingredient from the list.')
 
 class DeletePantryItemForm(FlaskForm):
     pass
