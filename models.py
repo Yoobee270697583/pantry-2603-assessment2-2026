@@ -49,6 +49,36 @@ class User(UserMixin, db.Model):
         lazy=True
     )
 
+class Ingredient(db.Model):
+    """
+    Canonical ingredient list, synced from TheMealDB.
+    PantryItem and RecipeIngredient reference this table so that
+    pantry items and recipe ingredients can be matched reliably.
+    """
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # idIngredient from TheMealDB
+    mealdb_id = db.Column(db.String(50), unique=True)
+
+    # Ingredient name
+    name = db.Column(
+        db.String(150),
+        nullable=False,
+        unique=True
+    )
+
+    # Thumbnail from TheMealDB
+    image_url = db.Column(db.String(500))
+
+    # Pantry items referencing this ingredient
+    pantry_items = db.relationship(
+        "PantryItem",
+        backref="ingredient",
+        lazy=True
+    )
+
 class PantryItem(db.Model):
     """
     Represents an ingredient stored in a user's pantry.
@@ -58,9 +88,10 @@ class PantryItem(db.Model):
     # Primary Key
     id = db.Column(db.Integer, primary_key=True)
 
-    # Ingredient name
-    name = db.Column(
-        db.String(100), 
+    # Ingredient this pantry item refers to - must exist in Ingredient table
+    ingredient_id = db.Column(
+        db.Integer,
+        db.ForeignKey("ingredient.id"),
         nullable=False
     )
 
