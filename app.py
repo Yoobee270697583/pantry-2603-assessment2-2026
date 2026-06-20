@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, url_for
-from models import db, User, Recipe, RecipeIngredient, PantryItem
+from models import db, User, Recipe, RecipeIngredient, PantryItem, Ingredient
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
-from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area, search_ingredients
+from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, get_categories, get_areas, filter_by_category, filter_by_area, fetch_ingredient_list
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
@@ -42,6 +42,18 @@ with app.app_context():
         for table in db.metadata.tables.keys():
             print(f"✅ {table}")
         print("=======================\n")
+
+    # one-time sync of the canonical ingredient list from TheMealDB so that
+    # pantry items can be validated against our own table instead of the
+    # live api on every request
+    if Ingredient.query.count() == 0:
+        for ing in fetch_ingredient_list():
+            db.session.add(Ingredient(
+                mealdb_id=ing.get("idIngredient"),
+                name=ing["strIngredient"],
+                image_url=ing.get("image_url")
+            ))
+        db.session.commit()
 
 # ============================================================================
 # ROUTES
@@ -142,7 +154,9 @@ def pantry():
         ingredient_search_query = request.args.get("q", "").strip()
 
         if ingredient_search_query:
-            api_ingredients = search_ingredients(ingredient_search_query)
+            api_ingredients = Ingredient.query.filter(
+                Ingredient.name.ilike(f"%{ingredient_search_query}%")
+            ).order_by(Ingredient.name.asc()).all()
             if len(api_ingredients) == 0:
                 ingredient_error = f"no ingredients found for '{ingredient_search_query}'"
 
@@ -165,12 +179,28 @@ def pantry():
 @login_required
 def add_pantry_item():
     form = AddPantryItemForm()
+
+    if request.method == "GET":
+        ingredient_id = request.args.get("ingredient_id", "")
+        form.ingredient_id.data = ingredient_id
+
+    ingredient = None
+    if form.ingredient_id.data:
+        try:
+            ingredient = Ingredient.query.get(int(form.ingredient_id.data))
+        except (TypeError, ValueError):
+            ingredient = None
+
+    if ingredient is None:
+        flash("Pick an ingredient from the Ingredients tab to add it to your pantry.", "error")
+        return redirect(url_for("pantry", tab="ingredients"))
+
     if form.validate_on_submit():
         new_pantry_item = PantryItem(
-            name=form.name.data, 
+            ingredient_id=ingredient.id,
             quantity=form.quantity.data,
             category=form.category.data,
-            unit=form.unit.data, 
+            unit=form.unit.data,
             expiry_date = form.expiry_date.data,
             owner=current_user)
         try:
@@ -183,7 +213,7 @@ def add_pantry_item():
             # flash('Something went wrong adding the pantry item. Please try again.', 'error')
     else:
         print("FORM ERRORS:", form.errors)
-    return render_template("add_pantry_item.html", form=form, active_page="pantry")
+    return render_template("add_pantry_item.html", form=form, ingredient=ingredient, active_page="pantry")
 
 @app.route("/pantry/delete/<int:item_id>", methods=["POST"])
 def delete_pantry_item(item_id):
@@ -196,10 +226,11 @@ def delete_pantry_item(item_id):
 def edit_pantry_item(item_id):
     item = PantryItem.query.get_or_404(item_id)
     form = AddPantryItemForm(obj=item)
+    form.ingredient_id.data = item.ingredient_id
 
     if form.validate_on_submit():
-        item.name = form.name.data
         item.quantity = form.quantity.data
+        item.category = form.category.data
         item.unit = form.unit.data
         item.expiry_date = form.expiry_date.data
         db.session.commit()
