@@ -377,15 +377,34 @@
     padding: 10px 24px;
     background: #2f7d57;
     color: #fff;
-    border: none;
+    border: solid 2px;
     border-radius: 6px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
+    width: 100%;
+}
+
+.btn-danger {
+    background: var(--surface) ;
+    color: var(--delete);
+    border-color: var(--delete);
 }
 
 .btn-submit:hover {
     background: #256647;
+}
+
+.btn-danger:hover {
+    background: var(--delete) ;
+    color: #fff;
+}
+
+.recipe-plan-wrapper {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 

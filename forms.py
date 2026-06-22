@@ -4,6 +4,11 @@ from wtforms.validators import InputRequired, Length, ValidationError, Email, Eq
 from models import User, Ingredient
 from constants import PANTRY_CATEGORY_CHOICES, PANTRY_UNIT_CHOICES
 
+
+# ============================================================================
+# USER FORMS
+# ============================================================================
+
 # The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
 class RegisterForm(FlaskForm):
     first_name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
@@ -23,13 +28,17 @@ class RegisterForm(FlaskForm):
         existing_user_email = User.query.filter_by(email=email.data).first()
         if existing_user_email:
             raise ValidationError('An account using that email already exists. Please log in instead.')
-    
-    
+
 # The LoginForm class defines the fields and validation rules for the login form using Flask-WTF and WTForms.
 class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Email(message='Invalid email'), Length(max=150)])
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
     submit = SubmitField('Login')
+    
+    
+# ============================================================================
+# PANTRY FORMS / CLASSES
+# ============================================================================
 
     # form for creating a custom recipe
 class CustomRecipeForm(FlaskForm):
@@ -73,6 +82,22 @@ class AddPantryItemForm(FlaskForm):
 
 class DeletePantryItemForm(FlaskForm):
     pass
+
+
+# ============================================================================
+# RECIPE FORMS
+# ============================================================================
+
+# form for creating a custom recipe
+class CustomRecipeForm(FlaskForm):
+    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
+    category = StringField(validators=[Optional(), Length(max=100)])
+    area = StringField(validators=[Optional(), Length(max=100)])
+    image_url = StringField(validators=[Optional(), Length(max=500)])
+    # one ingredient per line, format: "amount, ingredient name"
+    ingredients = TextAreaField(validators=[InputRequired()])
+    instructions = TextAreaField(validators=[InputRequired()])
+    submit = SubmitField('Save Recipe')
 
 # form for editing an existing saved recipe
 class EditRecipeForm(FlaskForm):

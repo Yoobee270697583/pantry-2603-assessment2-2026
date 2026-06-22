@@ -2,11 +2,50 @@
 
 {% block title %}Planned Meals — Pantry{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>Planned Meals</h1>
-<p>This is the Planned Meals screen. Content coming soon.</p>
+<p>This is the Planned Meals screen. Here you can see all the meals that you've planned to cook in the forseeable future.</p>
 
-<pre>
+    {% if planned_meals %}
+        <p class="results-count">{{ planned_meals | length }} meal(s)</p>
+        <div class="grid">
+            {% for item in planned_meals %}
+            <div class="recipe-plan-wrapper">
+                <a href="{{ url_for('saved_recipe_detail', recipe_id=item.recipe.id) }}" class="card">
+                    {% if item.recipe.image_url %}
+                        <img src="{{ item.recipe.image_url }}" alt="{{ item.recipe.name }}" class="card-img">
+                    {% else %}
+                        <div class="card-no-img">No Image</div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h3 class="card-title">{{ item.recipe.name }}</h3>
+                        {% if item.recipe.category or item.recipe.area %}
+                            <p class="card-meta">{{ item.recipe.category }}{% if item.recipe.category and item.recipe.area %} · {% endif %}{{ item.recipe.area }}</p>
+                        {% endif %}
+                        <p class="card-source">{{ item.recipe.source }}</p>
+                    </div>
+                </a>
+                <!-- {# <form action="{{ url_for('mark_as_cooked', recipe_id=item.recipe.id) }}" method="POST">
+                    <button type="submit" class="btn-submit">Cook This Meal</button>
+                </form> #} -->
+                <form action="{{ url_for('delete_planned_meal', item_id=item.plan.id) }}" method="POST">
+                    <button type="submit" class="btn-submit btn-danger">Remove from Planned Meals</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">no planned meals yet - head over to My Recipes and hit the "Plan this meal" to start your meal plan</p>
+    {% endif %}
+
+
+
+
+<!-- <pre>
 ### "Planned Meals"
 - Loose ordered list (not calendar-locked) of meals the user intends to cook soon
 - Add recipes from library, suggestions, or custom recipes
@@ -16,6 +55,6 @@
 - **Two primary buttons per meal:**
   - **Mark as cooked** — allocates the meal as cooked; dynamically updates Pantry inventory by removing the ingredients used, and moves the meal into Cooked Meals
   - **Delete** — removes the meal from the planned-to-cook queue (no pantry effect)
-</pre>
+</pre> -->
 
 {% endblock %}
