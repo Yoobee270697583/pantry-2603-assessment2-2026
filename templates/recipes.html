@@ -81,7 +81,11 @@
                     {% endif %}
                     <p class="card-source">{{ recipe.source }}</p>
                 </div>
-            </a>
+                </a>
+                <form action="{{ url_for('add_saved_to_plan', recipe_id=recipe.id) }}" method="POST">
+                    <button type="submit" class="btn-submit">Plan this meal</button>
+                </form>
+            </div>
             {% endfor %}
         </div>
     {% else %}
