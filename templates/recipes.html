@@ -67,20 +67,25 @@
         <p class="results-count">{{ saved_recipes | length }} recipe(s)</p>
         <div class="grid">
             {% for recipe in saved_recipes %}
-            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
-                {% if recipe.image_url %}
-                    <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
-                {% else %}
-                    <div class="card-no-img">No Image</div>
-                {% endif %}
-                <div class="card-body">
-                    <h3 class="card-title">{{ recipe.name }}</h3>
-                    {% if recipe.category or recipe.area %}
-                        <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+            <div class="recipe-plan-wrapper">
+                <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
+                    {% if recipe.image_url %}
+                        <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
+                    {% else %}
+                        <div class="card-no-img">No Image</div>
                     {% endif %}
-                    <p class="card-source">{{ recipe.source }}</p>
-                </div>
-            </a>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ recipe.name }}</h3>
+                        {% if recipe.category or recipe.area %}
+                            <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                        {% endif %}
+                        <p class="card-source">{{ recipe.source }}</p>
+                    </div>
+                </a>
+                <form action="{{ url_for('add_saved_to_plan', recipe_id=recipe.id) }}" method="POST">
+                    <button type="submit" class="btn-submit">Plan this meal</button>
+                </form>
+            </div>
             {% endfor %}
         </div>
     {% else %}
@@ -154,6 +159,7 @@
 
         <div class="grid">
             {% for meal in api_results %}
+            <div class="recipe-plan-wrapper">
             <a href="{{ url_for('recipe_detail', meal_id=meal.idMeal) }}" class="card">
                 <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="card-img">
                 <div class="card-body">
@@ -163,6 +169,10 @@
                     {% endif %}
                 </div>
             </a>
+            <form action="{{ url_for('add_searched_to_plan', meal_id=meal.idMeal) }}" method="POST">
+                <button type="submit" class="btn-submit">Plan this meal</button>
+            </form>
+            </div>
             {% endfor %}
         </div>
 
