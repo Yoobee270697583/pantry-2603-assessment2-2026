@@ -29,9 +29,9 @@
                         <p class="card-source">{{ item.recipe.source }}</p>
                     </div>
                 </a>
-                <!-- {# <form action="{{ url_for('mark_as_cooked', recipe_id=item.recipe.id) }}" method="POST">
+                <form action="{{ url_for('mark_as_cooked', item_id=item.plan.id) }}" method="POST">
                     <button type="submit" class="btn-submit">Cook This Meal</button>
-                </form> #} -->
+                </form>
                 <form action="{{ url_for('delete_planned_meal', item_id=item.plan.id) }}" method="POST">
                     <button type="submit" class="btn-submit btn-danger">Remove from Planned Meals</button>
                 </form>

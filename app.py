@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, redirect, flash, url_for
-from datetime import date
-from models import User, Recipe, MealPlan, RecipeIngredient, PantryItem, db, Ingredient
+from datetime import date, datetime
+from models import User, Recipe, MealPlan, RecipeIngredient, PantryItem, db, Ingredient, CookedMeal
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
-from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area, fetch_ingredient_list
+from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area, fetch_ingredient_list, get_or_create_recipe
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
@@ -12,8 +12,6 @@ from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, E
 # ============================================================================
 # DB Debug
 database_debug = True
-
-
 
 
 # Create the Flask application instance.
@@ -74,44 +72,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# This is a helper function to check if a MealDB recipe exists in our own database, and adds it if it doesn't.
-def get_or_create_recipe(user_id, meal_id):
-    
-    existing = Recipe.query.filter_by(user_id=user_id, mealdb_id=meal_id).first()
-
-    if existing:
-        return existing
-
-    meal = get_recipe_by_id(meal_id)
-
-    if meal is None:
-        return None
-
-    new_recipe = Recipe(
-        mealdb_id=meal["idMeal"],
-        name=meal["strMeal"],
-        category=meal.get("strCategory", ""),
-        area=meal.get("strArea", ""),
-        instructions=meal.get("strInstructions", ""),
-        image_url=meal.get("strMealThumb", ""),
-        youtube_url=meal.get("strYoutube", ""),
-        source="TheMealDB",
-        user_id=user_id
-    )
-    db.session.add(new_recipe)
-    db.session.flush()
-
-    # save the ingredients linked to this recipe
-    for item in get_ingredients(meal):
-        ingredient = RecipeIngredient(
-            name=item["name"],
-            amount=item["amount"],
-            recipe_id=new_recipe.id
-        )
-        db.session.add(ingredient)
-        
-    return new_recipe
-    
+ 
 # Each route below maps a URL to a function that returns a page.
 # render_template() finds the named file in templates/ and renders it,
 # passing in any variables we want available inside the Jinja2 template.
@@ -528,15 +489,15 @@ def suggestions():
 @app.route("/planned")
 @login_required
 def planned():
-    #retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
+    # Retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
     meal_plans = MealPlan.query.filter_by(user_id=current_user.id).order_by(MealPlan.id.asc()).all()
     
-    #get and store the recipe data including img, all metadata - because it's not in the MealPlan model
+    # Get and store the recipe data including img, all metadata - because it's not in the MealPlan model
     planned_meals = []
     
     for meal in meal_plans:
         recipe = Recipe.query.get(meal.recipe_id)
-        #put the retrieved meal_plans and recipes together into one variable     
+        # Put the retrieved meal_plans and recipes together into one variable     
         planned_meals.append({"plan": meal, "recipe": recipe})
         
     return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
@@ -593,19 +554,91 @@ def add_searched_to_plan(meal_id):
     return redirect(url_for('planned'))
     
 
+@app.route("/planned/mark_as_cooked/<int:item_id>", methods=['POST'])
+@login_required
+def mark_as_cooked(item_id):
+    
+    planned_meal = MealPlan.query.filter_by(id=item_id).first()
+    
+    if planned_meal is None:
+        flash('Could not find that Planned Meal. Please try again', 'error')
+        return redirect(url_for('planned'))
+    
+    cooked_meal = CookedMeal(
+        cooked_date=datetime.now(),
+        user_id=current_user.id,
+        recipe_id=planned_meal.recipe_id
+    )
+    
+    try:
+        db.session.add(cooked_meal)
+        db.session.delete(planned_meal)
+        db.session.commit()
+        flash('Meal has been successfully Cooked!')
+    except Exception:
+        db.session.rollback()
+        flash('Something went wrong. Please try again', 'error')
+        
+    return redirect(url_for('cooked'))
+
+
 @app.route("/planned/delete/<int:item_id>", methods=['POST'])
 @login_required
 def delete_planned_meal(item_id):
     item = MealPlan.query.get_or_404(item_id)
     db.session.delete(item)
     db.session.commit()
-    return redirect(url_for("planned"))
+    return redirect(url_for('planned'))
 
 
 @app.route("/cooked")
 @login_required
 def cooked():
-    return render_template("cooked.html", active_page="cooked")
+    
+    # Retrieve all cooked meals for the current user, ordered by ascending or oldest/lowest id - which means oldest cooked to newest cooked meals
+    all_cooked_meals = CookedMeal.query.filter_by(user_id=current_user.id).order_by(CookedMeal.id.asc()).all()
+    
+    # Get and store the recipe data including img, all metadata - because it's not in the CookedMeal model
+    cooked_meals = []
+    for meal in all_cooked_meals:   
+        recipe = Recipe.query.get(meal.recipe_id)
+        # Put the retrieved meal_plans and recipes together into one variable     
+        cooked_meals.append({"cooked": meal, "recipe": recipe})
+    
+    # Pass the data to the template
+    return render_template("cooked.html", active_page="cooked", cooked_meals=cooked_meals)
+
+
+@app.route("/cooked/add_cooked_to_plan/<int:recipe_id">, methods=['POST'])
+@login_required
+def add_cooked_to_plan(recipe_id):
+      
+    planned_meal = MealPlan(
+        planned_date=date.today(), 
+        user_id=current_user.id, 
+        recipe_id=recipe_id
+        )
+    
+    try:
+        db.session.add(planned_meal)
+        db.session.commit()
+        flash('Recipe successfully added to planned meals!')
+        return redirect(url_for('planned'))
+    except Exception:
+        db.session.rollback()
+        flash('Something went wrong adding the recipe to planned meals. Please try again.', 'error')
+
+    return redirect(url_for('planned'))
+
+
+@app.route("/cooked/delete/<int:item_id>", methods=['POST'])
+@login_required
+def delete_cooked_instance(item_id):
+    instance = CookedMeal.query.get_or_404(item_id)
+    db.session.delete(instance)
+    db.session.commit()
+    return redirect(url_for('cooked'))
+    
 
 
 @app.route("/shopping")

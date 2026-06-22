@@ -1,4 +1,5 @@
 import requests
+from models import Recipe, RecipeIngredient, db
 
 # base url for the meal api
 BASE_URL = "https://www.themealdb.com/api/json/v1/1/"
@@ -208,3 +209,50 @@ def fetch_ingredient_list():
     except Exception as error:
         print(f"something went wrong: {error}")
         return []
+    
+    
+    
+# This is a helper function to check if a MealDB recipe exists in our own database, and adds it if it doesn't
+def get_or_create_recipe(user_id, meal_id):
+    
+    # Check the database for a Recipe row based on user_id and meal_id passed in
+    existing = Recipe.query.filter_by(user_id=user_id, mealdb_id=meal_id).first()
+
+    # If it exists, return it
+    if existing:
+        return existing
+
+    # Otherwise, retrieve it from the API by API meal ID
+    meal = get_recipe_by_id(meal_id)
+
+    # Guard against a bad API call
+    if meal is None:
+        return None
+
+    # Save a row to our Recipe model
+    new_recipe = Recipe(
+        mealdb_id=meal["idMeal"],
+        name=meal["strMeal"],
+        category=meal.get("strCategory", ""),
+        area=meal.get("strArea", ""),
+        instructions=meal.get("strInstructions", ""),
+        image_url=meal.get("strMealThumb", ""),
+        youtube_url=meal.get("strYoutube", ""),
+        source="TheMealDB",
+        user_id=user_id
+    )
+    db.session.add(new_recipe)
+    db.session.flush()
+
+    # Save the ingredients to our RecipeIngredient model
+    for item in get_ingredients(meal):
+        ingredient = RecipeIngredient(
+            name=item["name"],
+            amount=item["amount"],
+            recipe_id=new_recipe.id
+        )
+        db.session.add(ingredient)
+    
+    # return the newly saved recipe
+    return new_recipe
+   
