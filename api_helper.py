@@ -173,7 +173,11 @@ def get_ingredients(meal):
 
     return ingredients
 
-def search_ingredients(search_term):
+def fetch_ingredient_list():
+    # gets the full canonical ingredient list from TheMealDB, used to sync
+    # our local Ingredient table - not used for per-search calls since the
+    # api has no auth/SLA and we don't want pantry validation depending on it
+
     try:
         url = BASE_URL + "list.php"
         response = requests.get(url, params={"i": "list"}, timeout=5)
@@ -186,18 +190,12 @@ def search_ingredients(search_term):
 
         all_ingredients = data["meals"]
 
-        search_term_lower = search_term.lower()
-        matches = [
-            ing for ing in all_ingredients
-            if search_term_lower in ing["strIngredient"].lower()
-        ]
-
-        # build the thumbnail url for each match
-        for ing in matches:
+        # build the thumbnail url for each ingredient
+        for ing in all_ingredients:
             name_for_url = ing["strIngredient"].replace(" ", "_")
             ing["image_url"] = f"https://www.themealdb.com/images/ingredients/{name_for_url}-small.png"
 
-        return matches
+        return all_ingredients
 
     except requests.exceptions.ConnectionError:
         print("no internet connection")

@@ -61,12 +61,6 @@ select {
     border-color: var(--delete);
 }
 
-.btn-danger {
-    background: var(--bg) ;
-    color: var(--delete);
-    border-color: var(--delete);
-}
-
 table {
     width: 100%;
     border-collapse: separate;
