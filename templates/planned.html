@@ -12,21 +12,21 @@
 
     {% if planned_meals %}
         <p class="results-count">{{ planned_meals | length }} meal(s)</p>
-        <div class="recipe-grid">
+        <div class="grid">
             {% for item in planned_meals %}
             <div class="recipe-plan-wrapper">
-                <a href="{{ url_for('saved_recipe_detail', recipe_id=item.recipe.id) }}" class="recipe-card">
+                <a href="{{ url_for('saved_recipe_detail', recipe_id=item.recipe.id) }}" class="card">
                     {% if item.recipe.image_url %}
-                        <img src="{{ item.recipe.image_url }}" alt="{{ item.recipe.name }}" class="recipe-card-img">
+                        <img src="{{ item.recipe.image_url }}" alt="{{ item.recipe.name }}" class="card-img">
                     {% else %}
-                        <div class="recipe-card-no-img">No Image</div>
+                        <div class="card-no-img">No Image</div>
                     {% endif %}
-                    <div class="recipe-card-body">
-                        <h3 class="recipe-card-title">{{ item.recipe.name }}</h3>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ item.recipe.name }}</h3>
                         {% if item.recipe.category or item.recipe.area %}
-                            <p class="recipe-card-meta">{{ item.recipe.category }}{% if item.recipe.category and item.recipe.area %} · {% endif %}{{ item.recipe.area }}</p>
+                            <p class="card-meta">{{ item.recipe.category }}{% if item.recipe.category and item.recipe.area %} · {% endif %}{{ item.recipe.area }}</p>
                         {% endif %}
-                        <p class="recipe-card-source">{{ item.recipe.source }}</p>
+                        <p class="card-source">{{ item.recipe.source }}</p>
                     </div>
                 </a>
                 <!-- {# <form action="{{ url_for('mark_as_cooked', recipe_id=item.recipe.id) }}" method="POST">

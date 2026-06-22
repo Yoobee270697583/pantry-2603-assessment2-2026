@@ -400,6 +400,13 @@
     color: #fff;
 }
 
+.recipe-plan-wrapper {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 
 /* ---- mobile ---- */
 

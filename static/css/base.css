@@ -278,6 +278,7 @@ table tbody tr:hover td {
     color: inherit;
     background: #fff;
     transition: box-shadow 0.2s, transform 0.2s;
+    height: 100%;
 }
 
 .card-body {
