@@ -541,11 +541,13 @@ def add_searched_to_plan(meal_id):
     user_id=current_user.id
     saved_recipe = get_or_create_recipe(user_id, meal_id)
     
-    search_query = request.form.get("q", "")
+    search_query = request.form.get("q") or None
+    selected_category = request.form.get("category") or None
+    selected_area = request.form.get("area") or None
     
     if saved_recipe is None:
         flash('Could not find that recipe. Please try again.', 'error')
-        return redirect(url_for('recipes', tab='search', q=search_query))
+        return redirect(url_for('recipes', tab='search', q=search_query, category=selected_category, area=selected_area))
     
     planned_meal = MealPlan(
         planned_date=date.today(), 
@@ -562,7 +564,7 @@ def add_searched_to_plan(meal_id):
         return redirect(url_for('planned'))
     
     flash(f'{saved_recipe.name} successfully added to Planned Meals! ✅', 'success')
-    return redirect(url_for('recipes', tab='search', q=search_query))
+    return redirect(url_for('recipes', tab='search', q=search_query, category=selected_category, area=selected_area))
     
 
 @app.route("/planned/mark_as_cooked/<int:item_id>", methods=['POST'])

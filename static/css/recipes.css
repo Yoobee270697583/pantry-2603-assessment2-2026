@@ -396,7 +396,7 @@
 }
 
 .btn-danger:hover {
-    background: var(--delete) ;
+    background: var(--danger) ;
     color: #fff;
 }
 
