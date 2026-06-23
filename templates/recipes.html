@@ -170,7 +170,8 @@
                 </div>
             </a>
             <form action="{{ url_for('add_searched_to_plan', meal_id=meal.idMeal) }}" method="POST">
-                <button type="submit" class="btn-submit">Plan this meal</button>
+                <input type="hidden" name="q" value="{{ search_query }}">
+                <button type="submit" class="btn-submit">Plan This Meal</button>
             </form>
             </div>
             {% endfor %}

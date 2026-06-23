@@ -529,8 +529,8 @@ def add_saved_to_plan(recipe_id):
         flash('Something went wrong adding the recipe to planned meals. Please try again.', 'error')
         return redirect(url_for('planned'))
 
-    flash(f'{recipe.name} added to Planned Meals! ✅')
-    return redirect(url_for('planned'))
+    flash(f'{recipe.name} added to Planned Meals! ✅', 'success')
+    return redirect(url_for('recipes'))
 
 
 @app.route("/planned/add_searched_to_plan/<meal_id>", methods=['POST'])
@@ -541,9 +541,11 @@ def add_searched_to_plan(meal_id):
     user_id=current_user.id
     saved_recipe = get_or_create_recipe(user_id, meal_id)
     
+    search_query = request.form.get("q", "")
+    
     if saved_recipe is None:
         flash('Could not find that recipe. Please try again.', 'error')
-        return redirect(url_for('recipes', tab='search'))
+        return redirect(url_for('recipes', tab='search', q=search_query))
     
     planned_meal = MealPlan(
         planned_date=date.today(), 
@@ -560,7 +562,7 @@ def add_searched_to_plan(meal_id):
         return redirect(url_for('planned'))
     
     flash(f'{saved_recipe.name} successfully added to Planned Meals! ✅', 'success')
-    return redirect(url_for('recipes', tab='search'))
+    return redirect(url_for('recipes', tab='search', q=search_query))
     
 
 @app.route("/planned/mark_as_cooked/<int:item_id>", methods=['POST'])
@@ -594,7 +596,7 @@ def mark_as_cooked(item_id):
         return redirect(url_for('planned'))
         
     flash(f'{recipe.name} successfully Cooked! ✅', 'success')
-    return redirect(url_for('cooked'))
+    return redirect(url_for('planned'))
 
 
 @app.route("/planned/delete/<int:item_id>", methods=['POST'])
@@ -616,7 +618,7 @@ def delete_planned_meal(item_id):
         flash('Something went wrong deleting that Planned Meal. Please Try again.', 'error')
         return redirect(url_for('planned'))
     
-    flash(f'{name} Successfully Deleted! ✅')
+    flash(f'{name} Successfully Deleted! ✅', 'success')
     return redirect(url_for('planned'))
 
 
@@ -659,10 +661,10 @@ def add_cooked_to_plan(recipe_id):
     except Exception:
         db.session.rollback()
         flash('Something went wrong adding the recipe to Planned Meals. Please try again.', 'error')
-        return redirect(url_for('planned'))
+        return redirect(url_for('cooked'))
     
     flash(f'{recipe.name} successfully added to Planned Meals! ✅', 'success')
-    return redirect(url_for('planned'))
+    return redirect(url_for('cooked'))
 
 
 @app.route("/cooked/delete/<int:item_id>", methods=['POST'])
