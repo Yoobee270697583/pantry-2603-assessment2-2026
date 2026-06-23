@@ -41,7 +41,8 @@
     <div class="grid">
         {% for recipe in suggested_recipes %}
         <div class="recipe-plan-wrapper">
-            <a href="{{ url_for('recipe_detail', meal_id=recipe.id) }}" class="card">
+            
+            <a href="{{ url_for('recipe_detail', meal_id=recipe.id, back='suggestions') }}" class="card">
                 <img src="{{ recipe.thumb }}" alt="{{ recipe.name }}" class="card-img">
                 <div class="card-body">
                     <h3 class="card-title">{{ recipe.name }}</h3>

@@ -3,10 +3,11 @@ from datetime import date
 from models import User, Recipe, MealPlan, RecipeIngredient, PantryItem, db, Ingredient
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area, fetch_ingredient_list
-# from ai_suggestions import get_suggested_recipes
+from ai_suggestions import get_suggested_recipes
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
+from dotenv import load_dotenv
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -19,6 +20,7 @@ database_debug = True
 
 # Create the Flask application instance.
 # __name__ tells Flask where to look for templates/ and static/ folders.
+load_dotenv()
 app = Flask(__name__)
 
 # Configures the SQLite database location
@@ -401,7 +403,7 @@ def recipe_detail(meal_id):
 @login_required
 def save_recipe(meal_id):
     # check if the user already saved this recipe, and if not, save it
-    recipe = get_or_create_recipe(meal_id, user_id=current_user.id)
+    recipe = get_or_create_recipe(current_user.id, meal_id)
     
     if recipe is None:
         return redirect(url_for("recipes"))
@@ -541,32 +543,32 @@ def create_recipe():
 @app.route("/suggestions", methods=["GET", "POST"])
 @login_required
 def suggestions():
-    # suggested_recipes = []
-    # error_message = ""
+    suggested_recipes = []
+    error_message = ""
 
-    # if request.method == "POST":
-    #     # get ingredient names through the ingredient relationship
-    #     pantry_item_names = [
-    #         item.ingredient.name
-    #         for item in PantryItem.query.filter_by(user_id=current_user.id).all()
-    #     ]
+    if request.method == "POST":
+        # get ingredient names through the ingredient relationship
+        pantry_item_names = [
+            item.ingredient.name
+            for item in PantryItem.query.filter_by(user_id=current_user.id).all()
+        ]
 
-    #     saved_recipe_names = [
-    #         r.name for r in Recipe.query.filter_by(user_id=current_user.id, source="TheMealDB").all()
-    #     ]
+        saved_recipe_names = [
+            r.name for r in Recipe.query.filter_by(user_id=current_user.id, source="TheMealDB").all()
+        ]
 
-    #     if not pantry_item_names:
-    #         error_message = "add some items to your pantry first to get recipe suggestions"
-    #     else:
-    #         suggested_recipes = get_suggested_recipes(pantry_item_names, saved_recipe_names)
-    #         if not suggested_recipes:
-    #             error_message = "couldn't find any matching recipes"
+        if not pantry_item_names:
+            error_message = "add some items to your pantry first to get recipe suggestions"
+        else:
+            suggested_recipes = get_suggested_recipes(pantry_item_names, saved_recipe_names)
+            if not suggested_recipes:
+                error_message = "couldn't find any matching recipes"
 
     return render_template(
         "suggestions.html",
-        active_page="suggestions"
-        # suggested_recipes=suggested_recipes,
-        # error_message=error_message
+        active_page="suggestions",
+        suggested_recipes=suggested_recipes,
+        error_message=error_message
     )
 
 

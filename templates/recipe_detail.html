@@ -8,7 +8,12 @@
 
 {% block content %}
 
-<a href="{{ url_for('recipes', tab='search') }}" class="back-link">← back to recipes</a>
+<!-- back link goes to suggestions or recipes depending on where the user came from -->
+{% if back == 'suggestions' %}
+    <a href="{{ url_for('suggestions') }}" class="back-link">← back to suggested recipes</a>
+{% else %}
+    <a href="{{ url_for('recipes', tab='search') }}" class="back-link">← back to recipes</a>
+{% endif %}
 
 <div class="recipe-header">
     <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="recipe-hero-img">
