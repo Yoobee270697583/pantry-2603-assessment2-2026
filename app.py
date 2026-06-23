@@ -3,6 +3,7 @@ from datetime import date
 from models import User, Recipe, MealPlan, RecipeIngredient, PantryItem, db, Ingredient
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area, fetch_ingredient_list
+# from ai_suggestions import get_suggested_recipes
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
@@ -421,6 +422,24 @@ def saved_recipe_detail(recipe_id):
     )
 
 
+@app.route("/recipes/saved/<int:recipe_id>/delete", methods=["POST"])
+@login_required
+def delete_recipe(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    # only the recipe owner can delete
+    if recipe.user_id != current_user.id:
+        return redirect(url_for("recipes"))
+
+    source = recipe.source
+    db.session.delete(recipe)
+    db.session.commit()
+
+    if source == "Custom":
+        return redirect(url_for("recipes", tab="created"))
+    return redirect(url_for("recipes", tab="saved"))
+
+
 @app.route("/recipes/saved/<int:recipe_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_recipe(recipe_id):
@@ -519,10 +538,36 @@ def create_recipe():
     return render_template("create_recipe.html", active_page="recipes", form=form)
 
 
-@app.route("/suggestions")
+@app.route("/suggestions", methods=["GET", "POST"])
 @login_required
 def suggestions():
-    return render_template("suggestions.html", active_page="suggestions")
+    # suggested_recipes = []
+    # error_message = ""
+
+    # if request.method == "POST":
+    #     # get ingredient names through the ingredient relationship
+    #     pantry_item_names = [
+    #         item.ingredient.name
+    #         for item in PantryItem.query.filter_by(user_id=current_user.id).all()
+    #     ]
+
+    #     saved_recipe_names = [
+    #         r.name for r in Recipe.query.filter_by(user_id=current_user.id, source="TheMealDB").all()
+    #     ]
+
+    #     if not pantry_item_names:
+    #         error_message = "add some items to your pantry first to get recipe suggestions"
+    #     else:
+    #         suggested_recipes = get_suggested_recipes(pantry_item_names, saved_recipe_names)
+    #         if not suggested_recipes:
+    #             error_message = "couldn't find any matching recipes"
+
+    return render_template(
+        "suggestions.html",
+        active_page="suggestions"
+        # suggested_recipes=suggested_recipes,
+        # error_message=error_message
+    )
 
 
 @app.route("/planned")

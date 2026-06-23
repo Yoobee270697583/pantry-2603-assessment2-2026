@@ -154,6 +154,27 @@ def filter_by_area(area):
         return []
 
 
+def filter_by_ingredient(ingredient):
+    # returns meals that use the given ingredient as a main component
+    # used by the suggested recipes feature to find pantry-matching candidates
+
+    try:
+        url = BASE_URL + "filter.php"
+        response = requests.get(url, params={"i": ingredient}, timeout=5)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data["meals"] is None:
+            return []
+
+        return data["meals"]
+
+    except Exception as error:
+        print(f"couldnt filter by ingredient: {error}")
+        return []
+
+
 def get_ingredients(meal):
     # the api stores ingredients as strIngredient1, strIngredient2 etc up to 20
     # this turns that into a normal list
