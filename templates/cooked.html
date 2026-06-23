@@ -2,16 +2,16 @@
 
 {% block title %}Cooked Meals — Pantry{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>Cooked Meals</h1> 
-<p>These are all the meals you've cooked:</p>
-
-
-<h1>Planned Meals</h1>
-<p>This is the Planned Meals screen. Here you can see all the meals that you've planned to cook in the forseeable future.</p>
+<p>These are all the meals you've cooked before:</p>
 
     {% if cooked_meals %}
-        <p class="results-count">{{ cooked_meals | length }} meal(s)</p>
+        <p class="results-count">{{ cooked_meals | length }} Cooked Meal(s)</p>
         <div class="grid">
             {% for item in cooked_meals %}
             <div class="recipe-plan-wrapper">
@@ -30,10 +30,10 @@
                     </div>
                 </a>
                 <form action="{{ url_for('add_cooked_to_plan', recipe_id=item.recipe.id) }}" method="POST">
-                    <button type="submit" class="btn-submit">Cook This Meal Again</button>
+                    <button type="submit" class="btn-submit">Plan This Meal Again</button>
                 </form>
                 <form action="{{ url_for('delete_cooked_instance', item_id=item.cooked.id) }}" method="POST">
-                    <button type="submit" class="btn-submit btn-danger">Delete Instance</button>
+                    <button type="submit" class="btn-submit btn-danger">Delete</button>
                 </form>
             </div>
             {% endfor %}
