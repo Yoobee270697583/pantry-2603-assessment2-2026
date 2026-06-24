@@ -540,7 +540,7 @@ def get_random_suggested_recipe(user_id):
 @app.route("/suggestions", methods=["GET", "POST"])
 @login_required
 def suggestions():
-    suggested_recipes = None
+    suggested_recipe = None
     error_message = ""
 
     if request.method == "POST":
@@ -556,7 +556,7 @@ def suggestions():
     return render_template(
         "suggestions.html",
         active_page="suggestions",
-        suggested_recipes=suggested_recipes,
+        suggested_recipe=suggested_recipe,
         error_message=error_message
     )
 
