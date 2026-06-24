@@ -11,7 +11,11 @@ from models import db, Ingredient, PantryItem, MealPlan, Recipe, ShoppingListIte
 # that quantities can be compared/subtracted even when the recipe and the
 # pantry item use different (but compatible) units.
 
-AMOUNT_RE = re.compile(r"^\s*([\d]+(?:[.,]\d+)?(?:\s*/\s*\d+)?)\s*([a-zA-Z]*)")
+# tried in order: mixed number ("1 1/2 cups"), simple fraction ("1/2 cup"),
+# then plain decimal/integer ("400g", "2 cups")
+MIXED_NUMBER_RE = re.compile(r"^\s*(\d+)\s+(\d+)\s*/\s*(\d+)\s*([a-zA-Z]*)")
+FRACTION_RE = re.compile(r"^\s*(\d+)\s*/\s*(\d+)\s*([a-zA-Z]*)")
+DECIMAL_RE = re.compile(r"^\s*(\d+(?:[.,]\d+)?)\s*([a-zA-Z]*)")
 
 # maps free-text unit words/synonyms onto the PANTRY_UNIT_CHOICES vocabulary
 UNIT_SYNONYMS = {
@@ -28,46 +32,66 @@ UNIT_SYNONYMS = {
     "lb": "lb", "lbs": "lb", "pound": "lb", "pounds": "lb",
 }
 
+# prep/descriptor words that sometimes sit where a unit would (e.g. "1
+# chopped onion") - these describe how the ingredient is prepared, not
+# how much of it there is, so they're treated as if no unit was given
+NON_UNIT_WORDS = {
+    "chopped", "diced", "sliced", "minced", "crushed", "grated", "ground",
+    "peeled", "drained", "melted", "softened", "beaten", "sifted",
+    "large", "medium", "small", "whole", "fresh", "frozen", "ripe",
+    "halved", "quartered", "cooked", "raw", "thinly", "finely", "roughly",
+}
+
 # (qty_per_unit, base_unit) - only units with a known, safe conversion
 MASS_TO_GRAMS = {"g": 1, "kg": 1000, "oz": 28, "lb": 454}
 VOLUME_TO_ML = {"ml": 1, "l": 1000, "tsp": 5, "tbsp": 15, "cup": 240}
 
 
-def _parse_fraction(text):
-    text = text.strip()
-    if "/" in text:
-        whole, _, frac = text.partition(" ")
-        if "/" in whole and not frac:
-            num, _, den = whole.partition("/")
-            return float(num) / float(den)
-        num, _, den = text.partition("/")
-        return float(num) / float(den)
-    return float(text.replace(",", "."))
-
-
 def parse_amount(amount_str):
-    """Parses a free-text recipe amount like '400g' or '2 cups' into (quantity, raw_unit)."""
+    """Parses a free-text recipe amount like '400g', '2 cups', or '1 1/2 cups' into (quantity, raw_unit)."""
     if not amount_str:
         return 1.0, ""
 
-    match = AMOUNT_RE.match(amount_str)
-    if not match:
-        return 1.0, ""
+    mixed_match = MIXED_NUMBER_RE.match(amount_str)
+    if mixed_match:
+        whole, num, den, unit_text = mixed_match.groups()
+        quantity = float(whole) + float(num) / float(den)
+        return quantity, unit_text.strip().lower()
 
-    qty_text, unit_text = match.groups()
-    try:
-        quantity = _parse_fraction(qty_text)
-    except (ValueError, ZeroDivisionError):
-        quantity = 1.0
+    fraction_match = FRACTION_RE.match(amount_str)
+    if fraction_match:
+        num, den, unit_text = fraction_match.groups()
+        quantity = float(num) / float(den)
+        return quantity, unit_text.strip().lower()
 
-    return quantity, unit_text.strip().lower()
+    decimal_match = DECIMAL_RE.match(amount_str)
+    if decimal_match:
+        qty_text, unit_text = decimal_match.groups()
+        quantity = float(qty_text.replace(",", "."))
+        return quantity, unit_text.strip().lower()
+
+    return 1.0, ""
 
 
 def normalize_unit(raw_unit):
-    """Sanitizes a free-text unit word into the pantry's unit vocabulary, or 'other' if unknown."""
+    """Sanitizes a free-text unit word into the pantry's unit vocabulary.
+
+    Recognized synonyms map onto the shared vocabulary so they can be
+    compared/converted. Unrecognized-but-present words (e.g. "bunch",
+    "clove") are kept as their own literal unit rather than being
+    collapsed into a single generic bucket - otherwise unrelated
+    descriptive measures (e.g. "1 bunch" and a bare "2") would get
+    summed together as if they were the same unit. A bare count with no
+    unit word at all (e.g. "2 onions" -> amount "2"), or a prep word that
+    isn't really a unit (e.g. "1 chopped onion"), is assumed to mean
+    "each".
+    """
     if not raw_unit:
-        return "other"
-    return UNIT_SYNONYMS.get(raw_unit.strip().lower(), "other")
+        return "each"
+    cleaned = raw_unit.strip().lower()
+    if cleaned in NON_UNIT_WORDS:
+        return "each"
+    return UNIT_SYNONYMS.get(cleaned, cleaned)
 
 
 def to_base(quantity, unit):

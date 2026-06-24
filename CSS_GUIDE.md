@@ -4,149 +4,114 @@ Purpose: document where styles live, which responsibilities belong in each file,
 
 ---
 
-1) File responsibilities (what goes where)
+### 1) File responsibilities (what goes where)
 
-- `static/css/base.css` — resets, CSS variables (design tokens), typography, small utilities, and form/button primitives. Always load this first.
-- `static/css/app-shell.css` — app-shell layout and navigation: left-nav, bottom-nav, `.content` container, global layout breakpoints. Loaded by templates that extend `base.html`.
-- `static/css/auth.css` — login/register screens and auth-specific components. Loaded by `auth-base.html` (or auth templates).
-- `static/css/<page>.css` — page-specific styles (e.g., `recipes.css`). Only load these on the pages that need them via the template `styles` block.
+| File | Loaded by | Responsibility |
+|---|---|---|
+| `static/css/base.css` | `base.html` (always) | Resets, `:root` design tokens, typography, flash messages, shared primitives reused across most pages: buttons (`.btn-primary`, `.btn-secondary`, `.btn-rounded`, `.btn-danger`), `table`, `.form-field`, `.toolbar`/`.search-input`/`.btn-search`, `.filter-bar`, `.grid`/`.card`/`.card-*`, `.tab-bar`, `.page-header` |
+| `static/css/app-shell.css` | `base.html` (always) | App-shell layout/navigation: `.left-nav`, `.bottom-nav`, `.content`, global layout breakpoints |
+| `static/css/auth.css` | `auth_base.html` (login/register) | `.auth-page`, `.auth-card`, auth-specific button/form tweaks |
+| `static/css/pantry.css` | `pantry.html`, `shopping.html` | Pantry-tinted form variant (`.pantry-form-field`), `.ingredient-card`, `.item-actions`, `.btn-icon` |
+| `static/css/recipes.css` | `recipes.html`, `recipe_detail.html`, `saved_recipe_detail.html`, `create_recipe.html`, `edit_recipe.html`, `planned.html`, `cooked.html`, `suggestions.html` | Recipe cards/detail, `.tag`, `.search-error`/`.empty-state`, `.recipe-form`, `.btn-submit`, suggestion buttons |
+| `static/css/shopping.css` | `shopping.html`, `orders.html` | Quantity stepper, manual-add panel, order cards |
 
-Guideline: keep selectors local to their responsibility (no layout rules in page CSS; no page-specific rules in `base.css`).
+Guideline: keep selectors local to their responsibility — no layout rules in page CSS, no page-specific rules in `base.css`. If a class is genuinely shared across 3+ pages (not just visually similar but the *same* component), it belongs in `base.css`, not duplicated.
+
+**Known duplication (accepted, not yet cleaned up):** `shopping.css` duplicates a handful of small selectors from `recipes.css` (`.tag`, `.empty-state`, `.search-error`) because `shopping.html`/`orders.html` don't load `recipes.css`. If you touch any of these three classes, **update both `recipes.css` and `shopping.css`**, or better — promote them into `base.css` and delete both copies, since they're used by enough pages now to count as shared primitives.
 
 ---
 
-2) Template pattern (blocks & ordering)
+### 2) Template pattern (blocks & ordering)
 
-- `templates/base.html` should load the shared files and expose a `styles` block for page CSS:
+`templates/base.html` loads the shared files and exposes a `styles` block for page CSS:
 
 ```html
-<!DOCTYPE html>
-<html>
 <head>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-style.css') }}">
-  {% block styles %}{% endblock %}
-  <title>{% block title %}Pantry{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app-shell.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    {% block styles %}{% endblock %}
 </head>
-<body>
-  {% block content %}{% endblock %}
-</body>
-</html>
 ```
 
-- `templates/auth-base.html` should load `base.css` + `auth.css` and also provide a `styles` block:
+`templates/auth_base.html` loads `base.css` + `auth.css` instead of the app shell, and still exposes its own `styles` block.
 
-```html
-<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-{% block styles %}{% endblock %}
-```
-
-Why: this keeps the reset & tokens consistently applied while letting pages opt into extra CSS only when needed.
-
----
-
-3) Adding a new page (step-by-step)
-
-1. Create the template and extend the correct base:
+A typical page extends `base.html` and loads only the page CSS it needs:
 
 ```jinja
 {% extends "base.html" %}
-{% block title %}My Page — Pantry{% endblock %}
+{% block title %}Shopping List — Pantry{% endblock %}
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/my-page.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pantry.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
 {% endblock %}
 {% block content %}
   <!-- page markup -->
 {% endblock %}
 ```
 
-2. Add `static/css/my-page.css` with only rules needed for this page (controls, grid, cards).
+Why: this keeps the reset & tokens consistently applied while letting pages opt into extra CSS only when needed. A page can load more than one page-specific stylesheet (see `shopping.html` above) when it genuinely reuses components from another page.
 
-3. Add the route in Flask and pass `active_page` when the page should highlight a sidebar item:
+---
+
+### 3) Adding a new page (step-by-step)
+
+1. Create the template, extend `base.html`, and load the CSS file(s) it needs in the `styles` block (see example above).
+2. Add `static/css/<page>.css` with only the rules that page needs (controls, grid, cards) — check the table in section 1 first in case an existing file already covers it.
+3. Add the route in `app.py` and pass `active_page` so the correct nav link gets `.is-active`:
 
 ```py
-@app.route('/my-page')
-def my_page():
-    return render_template('my-page.html', active_page='recipes')
+@app.route('/shopping')
+@login_required
+def shopping():
+    return render_template('shopping.html', active_page='shopping')
 ```
 
-4. If the page should be linked in the left-nav, add the link in `base.html` and rely on the `active_page` variable to add the `.is-active` class.
+4. If the page should appear in the left-nav (`templates/base.html`) and bottom-nav, add the link there — the nav CSS already uses `.left-nav-links a.is-active` / `.bottom-nav a.is-active`.
 
 ---
 
-4) Example: recipes page and nested nav styles
+### 4) Naming and organization rules
 
-- `templates/recipes.html` should extend `base.html` and load `recipes.css` via `styles` block (see above). Put search, grid, and card rules in `static/css/recipes.css`.
-
-- If you add a nested page (for example `/recipes/new` or `/recipes/vegetarian`) that should keep the Recipes nav item active, render it with `active_page='recipes'` from the view function. The left-nav CSS already uses `.left-nav-links a.is-active` to style the active link.
-
-Example Flask snippet:
-
-```py
-@app.route('/recipes/vegetarian')
-def recipes_vegetarian():
-    results = get_vegetarian_recipes()
-    return render_template('recipes-veg.html', results=results, active_page='recipes')
-```
-
-In `recipes-veg.html` use the same `recipes.css` or create a small `recipes-veg.css` and load it in the `styles` block. Keep visual differences small and driven by variables in `base.css`.
+- Prefer component-prefixed classes for clarity: `.recipe-header`, `.ingredient-card`, `.qty-stepper` instead of very generic names like `.box` or `.item`.
+- Keep media queries next to the component they change, within the same file. `base.css` has the two global breakpoints (`768px`, `480px`); page CSS only needs its own breakpoint overrides for things not already handled globally (see `recipes.css`'s mobile block for an example).
+- One reset only — it lives in `base.css`. Don't add resets to page-specific files.
 
 ---
 
-5) Naming and organization rules (short)
+### 5) Design tokens
 
-- Prefer component-prefixed classes for clarity: `.form-field`, `.auth-card`, `.recipe-card` instead of very generic `.field`.
-- Keep utility classes (e.g., `.text-center`, `.mt-8`) small and documented in `base.css` if you use them.
-- Keep media queries next to the component they change (within the same file). Only extract shared responsive helpers if duplicated across files.
-
----
-
-6) CSS resets and tokens
-
-- One reset only: put it in `base.css`.
-- Define colors, radii, shadows as `:root` variables in `base.css` so all files use the same tokens.
-
----
-
-### Tokens (examples and usage)
-
-Use CSS custom properties in `:root` inside `base.css` so every stylesheet can consume the same design tokens.
-
-Example `:root` token set (keep names short and semantic):
+`base.css` defines the actual tokens used throughout the app, under `:root`:
 
 ```css
 :root {
-  --color-bg: #f7f8f7;
-  --color-surface: #ffffff;
-  --color-text: #1f2421;
-  --color-muted: #6b7a6e;
-  --brand: #0f6e56;
-  --brand-600: #1d9e75;
-
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 24px;
-
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
+    --bg: #f7f8f7;
+    --surface: #ffffff;
+    --surface-soft: #f6f6f3;
+    --text: #1f2421;
+    --muted: #6b7a6e;
+    --brand: #0f6e56;
+    --brand-hover: #1d9e75;
+    --danger: #FF575A;
+    --border: #e3e6e3;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --shadow-sm: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 ```
 
-Usage patterns:
+Usage:
 
-- Reference tokens in component CSS: `background: var(--color-surface); border-radius: var(--radius-md);`.
-- Compose tokens for variants: `background: linear-gradient(0deg, rgba(15,110,86,0.08), transparent), var(--color-surface);`.
-- Provide fallback values when necessary: `color: var(--color-text, #1f2421);`.
+```css
+.card {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+```
 
-Developer notes:
-
-- Keep token names semantic (e.g., `--brand`, `--color-surface`) rather than tied to a single use-case (`--panel-green`), so they remain reusable.
-- Add tokens to `base.css` only. If a page needs a one-off value, prefer a component-level variable prefixed with the component name.
-
+Notes:
+- A lot of older/page-specific CSS (e.g. most of `recipes.css`, `pantry.css`) still uses hardcoded hex values (`#2f7d57`, `#6b7a6e`, etc.) instead of these tokens, predating the token system. **New CSS should use the `var(--...)` tokens above**, not hardcoded colors — don't copy the hardcoded-hex pattern from older files just because it's already there.
+- Add new tokens to `base.css` only. If a page needs a one-off value that isn't reusable, keep it scoped to that page's CSS file rather than polluting `:root`.
 
 ---
