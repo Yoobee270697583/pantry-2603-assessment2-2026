@@ -12,21 +12,21 @@
     <h1>Suggested Recipes</h1>
     <div class="page-header-actions">
 
-        <!-- get suggestions: active on first load, grey after results appear -->
+        <!-- active when no recipe shown, grey once a recipe is displayed -->
         <form action="{{ url_for('suggestions') }}" method="POST">
             <button
                 type="submit"
-                class="btn-create {% if suggested_recipes %}btn-disabled{% endif %}"
-                {% if suggested_recipes %}disabled{% endif %}
-            >Get Suggestions</button>
+                class="btn-create {% if suggested_recipe %}btn-disabled{% endif %}"
+                {% if suggested_recipe %}disabled{% endif %}
+            >Get Suggestion</button>
         </form>
 
-        <!-- refresh: grey until get suggestions has been clicked -->
-        <form action="{{ url_for('suggestions') }}" method="POST">
+        <!-- grey until a recipe is shown, clears the page when clicked -->
+        <form action="{{ url_for('suggestions_refresh') }}" method="POST">
             <button
                 type="submit"
-                class="btn-random {% if not suggested_recipes %}btn-disabled{% endif %}"
-                {% if not suggested_recipes %}disabled{% endif %}
+                class="btn-random {% if not suggested_recipe %}btn-disabled{% endif %}"
+                {% if not suggested_recipe %}disabled{% endif %}
             >↻ Refresh</button>
         </form>
 
@@ -37,32 +37,30 @@
     <p class="search-error">{{ error_message }}</p>
 {% endif %}
 
-{% if suggested_recipes %}
+{% if suggested_recipe %}
     <div class="grid">
-        {% for recipe in suggested_recipes %}
         <div class="recipe-plan-wrapper">
-            
-            <a href="{{ url_for('recipe_detail', meal_id=recipe.id, back='suggestions') }}" class="card">
-                <img src="{{ recipe.thumb }}" alt="{{ recipe.name }}" class="card-img">
+            <a href="{{ url_for('saved_recipe_detail', recipe_id=suggested_recipe.id) }}" class="card">
+                {% if suggested_recipe.image_url %}
+                    <img src="{{ suggested_recipe.image_url }}" alt="{{ suggested_recipe.name }}" class="card-img">
+                {% else %}
+                    <div class="card-no-img">No Image</div>
+                {% endif %}
                 <div class="card-body">
-                    <h3 class="card-title">{{ recipe.name }}</h3>
-                    {% if recipe.category or recipe.area %}
-                        <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
-                    {% endif %}
-                    {% if recipe.reason %}
-                        <p class="suggestion-reason">{{ recipe.reason }}</p>
+                    <h3 class="card-title">{{ suggested_recipe.name }}</h3>
+                    {% if suggested_recipe.category or suggested_recipe.area %}
+                        <p class="card-meta">{{ suggested_recipe.category }}{% if suggested_recipe.category and suggested_recipe.area %} · {% endif %}{{ suggested_recipe.area }}</p>
                     {% endif %}
                 </div>
             </a>
-            <form action="{{ url_for('add_searched_to_plan', meal_id=recipe.id) }}" method="POST">
+            <form action="{{ url_for('add_saved_to_plan', recipe_id=suggested_recipe.id) }}" method="POST">
                 <button type="submit" class="btn-submit">Plan this meal</button>
             </form>
         </div>
-        {% endfor %}
     </div>
 
 {% elif not error_message %}
-    <p class="search-prompt">click get suggestions to find recipes that match your pantry</p>
+    <p class="search-prompt">click get suggestion to find a recipe that matches your pantry</p>
 {% endif %}
 
 {% endblock %}

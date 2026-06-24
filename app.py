@@ -3,11 +3,10 @@ from datetime import date
 from models import User, Recipe, MealPlan, RecipeIngredient, PantryItem, db, Ingredient
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area, fetch_ingredient_list
-from ai_suggestions import get_suggested_recipes
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm,CustomRecipeForm, AddPantryItemForm, EditRecipeForm, DeletePantryItemForm
-from dotenv import load_dotenv
+import random
 
 # ============================================================================
 # APPLICATION CONFIGURATION
@@ -20,7 +19,6 @@ database_debug = True
 
 # Create the Flask application instance.
 # __name__ tells Flask where to look for templates/ and static/ folders.
-load_dotenv()
 app = Flask(__name__)
 
 # Configures the SQLite database location
@@ -540,29 +538,55 @@ def create_recipe():
     return render_template("create_recipe.html", active_page="recipes", form=form)
 
 
+def get_random_suggested_recipe(user_id):
+    # get all pantry ingredient names for this user
+    pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
+    pantry_names = set(item.ingredient.name.lower() for item in pantry_items)
+
+    if not pantry_names:
+        return None
+
+    # get all saved TheMealDB recipes with their stored ingredients
+    saved_recipes = Recipe.query.filter_by(user_id=user_id, source="TheMealDB").all()
+
+    if not saved_recipes:
+        return None
+
+    # count how many of each recipe's ingredients are in the pantry
+    recipe_scores = []
+    for recipe in saved_recipes:
+        recipe_ingredient_names = set(i.name.lower() for i in recipe.ingredients)
+        matches = len(pantry_names & recipe_ingredient_names)
+        recipe_scores.append((recipe, matches))
+
+    # only keep recipes that match at least one pantry item
+    matched = [(r, score) for r, score in recipe_scores if score > 0]
+
+    if not matched:
+        return None
+
+    # find the highest match count then pick randomly from those
+    best_score = max(score for _, score in matched)
+    best_recipes = [r for r, score in matched if score == best_score]
+
+    return random.choice(best_recipes)
+
+
 @app.route("/suggestions", methods=["GET", "POST"])
 @login_required
 def suggestions():
-    suggested_recipes = []
+    suggested_recipes = None
     error_message = ""
 
     if request.method == "POST":
-        # get ingredient names through the ingredient relationship
-        pantry_item_names = [
-            item.ingredient.name
-            for item in PantryItem.query.filter_by(user_id=current_user.id).all()
-        ]
+        suggested_recipe = get_random_suggested_recipe(current_user.id)
 
-        saved_recipe_names = [
-            r.name for r in Recipe.query.filter_by(user_id=current_user.id, source="TheMealDB").all()
-        ]
-
-        if not pantry_item_names:
-            error_message = "add some items to your pantry first to get recipe suggestions"
-        else:
-            suggested_recipes = get_suggested_recipes(pantry_item_names, saved_recipe_names)
-            if not suggested_recipes:
-                error_message = "couldn't find any matching recipes"
+        if suggested_recipe is None:
+            has_pantry = PantryItem.query.filter_by(user_id=current_user.id).first()
+            if not has_pantry:
+                error_message = "add some items to your pantry first to get recipe suggestions"
+            else:
+                error_message = "none of your saved recipes match your current pantry items"
 
     return render_template(
         "suggestions.html",
@@ -570,6 +594,13 @@ def suggestions():
         suggested_recipes=suggested_recipes,
         error_message=error_message
     )
+
+
+@app.route("/suggestions/refresh", methods=["POST"])
+@login_required
+def suggestions_refresh():
+    # clears the page by redirecting back to the clean GET
+    return redirect(url_for("suggestions"))
 
 
 @app.route("/planned")
