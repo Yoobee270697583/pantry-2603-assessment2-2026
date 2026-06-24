@@ -85,6 +85,36 @@ class DeletePantryItemForm(FlaskForm):
 
 
 # ============================================================================
+# SHOPPING LIST FORMS
+# ============================================================================
+
+# Manual "add item" form for the Shopping List screen
+class AddShoppingItemForm(FlaskForm):
+    # Ingredient being added - must reference an existing Ingredient row,
+    # selected from an ingredient search rather than typed freely
+    ingredient_id = HiddenField(validators=[InputRequired()])
+    quantity = FloatField(validators=[InputRequired()])
+    unit = SelectField(
+        "Unit",
+        choices=PANTRY_UNIT_CHOICES,
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Add Item')
+
+    def validate_ingredient_id(self, ingredient_id):
+        try:
+            ingredient = Ingredient.query.get(int(ingredient_id.data))
+        except (TypeError, ValueError):
+            ingredient = None
+        if ingredient is None:
+            raise ValidationError('Choose an ingredient from the list.')
+
+
+class ShoppingItemActionForm(FlaskForm):
+    pass
+
+
+# ============================================================================
 # RECIPE FORMS
 # ============================================================================
 
