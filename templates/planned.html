@@ -11,7 +11,7 @@
 <p>This is the Planned Meals screen. Here you can see all the meals that you've planned to cook in the forseeable future.</p>
 
     {% if planned_meals %}
-        <p class="results-count">{{ planned_meals | length }} meal(s)</p>
+        <p class="results-count">{{ planned_meals | length }} Planned Meal(s)</p>
         <div class="grid">
             {% for item in planned_meals %}
             <div class="recipe-plan-wrapper">
@@ -29,9 +29,9 @@
                         <p class="card-source">{{ item.recipe.source }}</p>
                     </div>
                 </a>
-                <!-- {# <form action="{{ url_for('mark_as_cooked', recipe_id=item.recipe.id) }}" method="POST">
+                <form action="{{ url_for('mark_as_cooked', item_id=item.plan.id) }}" method="POST">
                     <button type="submit" class="btn-submit">Cook This Meal</button>
-                </form> #} -->
+                </form>
                 <form action="{{ url_for('delete_planned_meal', item_id=item.plan.id) }}" method="POST">
                     <button type="submit" class="btn-submit btn-danger">Remove from Planned Meals</button>
                 </form>
@@ -41,20 +41,5 @@
     {% else %}
         <p class="empty-state">no planned meals yet - head over to My Recipes and hit the "Plan this meal" to start your meal plan</p>
     {% endif %}
-
-
-
-
-<!-- <pre>
-### "Planned Meals"
-- Loose ordered list (not calendar-locked) of meals the user intends to cook soon
-- Add recipes from library, suggestions, or custom recipes
-- Drag-to-reorder for shifting priorities (e.g. expiring ingredients)
-- Feeds directly into the dynamic shopping list
-- **Per-meal card** — tapping/clicking the meal card always opens the full recipe spec
-- **Two primary buttons per meal:**
-  - **Mark as cooked** — allocates the meal as cooked; dynamically updates Pantry inventory by removing the ingredients used, and moves the meal into Cooked Meals
-  - **Delete** — removes the meal from the planned-to-cook queue (no pantry effect)
-</pre> -->
 
 {% endblock %}

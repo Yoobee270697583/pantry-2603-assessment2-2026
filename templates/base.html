@@ -46,6 +46,14 @@
         </footer>
     </nav>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash flash-{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
 
     <!-- Main Content Block -->
     <main class="content">
@@ -78,6 +86,14 @@
             }
         });
     </script>
+<script>
+    setTimeout(function () {
+        document.querySelectorAll('.flash').forEach(function (msg) {
+            msg.classList.add('flash-hide');
+            setTimeout(function () { msg.remove(); }, 1000);
+        });
+    }, 2500);
+</script>
 
 </body>
 </html>

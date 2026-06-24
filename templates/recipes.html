@@ -64,7 +64,7 @@
     </div>
 
     {% if saved_recipes %}
-        <p class="results-count">{{ saved_recipes | length }} recipe(s)</p>
+        <p class="results-count">{{ saved_recipes | length }} Saved Recipe(s)</p>
         <div class="grid">
             {% for recipe in saved_recipes %}
             <div class="recipe-plan-wrapper">
@@ -170,7 +170,10 @@
                 </div>
             </a>
             <form action="{{ url_for('add_searched_to_plan', meal_id=meal.idMeal) }}" method="POST">
-                <button type="submit" class="btn-submit">Plan this meal</button>
+                <input type="hidden" name="q" value="{{ search_query }}">
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                <input type="hidden" name="area" value="{{ selected_area }}">
+                <button type="submit" class="btn-submit">Plan This Meal</button>
             </form>
             </div>
             {% endfor %}

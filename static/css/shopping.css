@@ -1,0 +1,78 @@
+/* shared with recipes.css - duplicated here since shopping.html doesn't load that stylesheet */
+.search-error {
+    color: #c0392b;
+    background: #fdf0ef;
+    border: 1px solid #f5c6c2;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    color: #6b7a6e;
+    margin-top: 8px;
+}
+
+.tag {
+    background: #eaf4ee;
+    color: #2f7d57;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+/* ---- quantity stepper ---- */
+
+.qty-stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-stepper form {
+    display: inline-flex;
+}
+
+.qty-stepper .btn-icon {
+    border: 1px solid var(--border);
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+}
+
+.qty-value {
+    min-width: 3.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* ---- orders ---- */
+
+.order-card {
+    margin-bottom: 20px;
+}
+
+.order-card table {
+    margin-top: 12px;
+}
+
+/* ---- manual add panel ---- */
+
+.manual-add-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.manual-add-qty {
+    width: 4.5rem;
+    padding: 6px 8px;
+    border: 1px solid #c8d0ca;
+    border-radius: 6px;
+}

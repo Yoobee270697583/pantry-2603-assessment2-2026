@@ -2,11 +2,49 @@
 
 {% block title %}Cooked Meals — Pantry{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>Cooked Meals</h1> 
-<p>This is the Cooked Meals screen. Content coming soon.</p>
+<p>These are all the meals you've cooked before:</p>
 
-<pre>
+    {% if cooked_meals %}
+        <p class="results-count">{{ cooked_meals | length }} Cooked Meal(s)</p>
+        <div class="grid">
+            {% for item in cooked_meals %}
+            <div class="recipe-plan-wrapper">
+                <a href="{{ url_for('saved_recipe_detail', recipe_id=item.recipe.id) }}" class="card">
+                    {% if item.recipe.image_url %}
+                        <img src="{{ item.recipe.image_url }}" alt="{{ item.recipe.name }}" class="card-img">
+                    {% else %}
+                        <div class="card-no-img">No Image</div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h3 class="card-title">{{ item.recipe.name }}</h3>
+                        {% if item.recipe.category or item.recipe.area %}
+                            <p class="card-meta">{{ item.recipe.category }}{% if item.recipe.category and item.recipe.area %} · {% endif %}{{ item.recipe.area }}</p>
+                        {% endif %}
+                        <p class="card-source">{{ item.recipe.source }}</p>
+                    </div>
+                </a>
+                <form action="{{ url_for('add_cooked_to_plan', recipe_id=item.recipe.id) }}" method="POST">
+                    <button type="submit" class="btn-submit">Plan This Meal Again</button>
+                </form>
+                <form action="{{ url_for('delete_cooked_instance', item_id=item.cooked.id) }}" method="POST">
+                    <button type="submit" class="btn-submit btn-danger">Delete</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">no planned meals yet - head over to My Recipes and hit the "Plan this meal" to start your meal plan</p>
+    {% endif %}
+
+
+
+<!-- <pre>
 ### "Cooked Meals"
 - Meals marked as cooked move from Planned Meals into a timestamped log here
 - Records: recipe, date cooked
@@ -23,6 +61,7 @@
   **Undo** and **Delete** are tucked into an overflow menu / the expanded card view rather than sitting as exposed buttons 
     keeps each card uncluttered (important on mobile) and keeps the destructive/reversal actions one deliberate step away
 - **Design consideration:** Delete may still warrant a light confirm step since it's destructive to history, but it no longer has to carry the inventory-restoration ambiguity — that's Undo's job
-</pre>
+</pre> -->
+
 
 {% endblock %}

@@ -387,8 +387,8 @@
 
 .btn-danger {
     background: var(--surface) ;
-    color: var(--delete);
-    border-color: var(--delete);
+    color: var(--danger);
+    border-color: var(--danger);
 }
 
 .btn-submit:hover {
@@ -396,7 +396,7 @@
 }
 
 .btn-danger:hover {
-    background: var(--delete) ;
+    background: var(--danger) ;
     color: #fff;
 }
 

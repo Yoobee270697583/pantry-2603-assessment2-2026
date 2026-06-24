@@ -286,3 +286,102 @@ class CookedMeal(db.Model):
         db.ForeignKey("recipe.id"),
         nullable=False
     )
+
+class ShoppingListItem(db.Model):
+    """
+    Represents a single item on a user's shopping list.
+    Auto-generated items (is_manual=False) are regenerated whenever the
+    user's planned meals or pantry stock changes; manually added items
+    are left untouched by that resync.
+    """
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # User this shopping list item belongs to
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    # Ingredient this item refers to - must exist in Ingredient table
+    ingredient_id = db.Column(
+        db.Integer,
+        db.ForeignKey("ingredient.id"),
+        nullable=False
+    )
+
+    # Amount needed
+    quantity = db.Column(db.Float, nullable=False)
+
+    # Unit of measurement (g, kg, ml, l, each etc)
+    unit = db.Column(db.String(50), nullable=False)
+
+    # False for items derived from planned meals, True for user-added items
+    is_manual = db.Column(db.Boolean, default=False, nullable=False)
+
+    # Ingredient this item refers to
+    ingredient = db.relationship("Ingredient")
+
+class Order(db.Model):
+    """
+    Historical log of shopping lists that were applied to the pantry
+    via the "Add List To Pantry" action.
+    """
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # User who placed the order
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    # Date/time the order was placed
+    ordered_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    # Items included in this order
+    items = db.relationship(
+        "OrderItem",
+        backref="order",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+class OrderItem(db.Model):
+    """
+    Snapshot of a single ingredient/quantity added to the pantry as part
+    of an Order.
+    """
+
+    # Primary Key
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Order this item belongs to
+    order_id = db.Column(
+        db.Integer,
+        db.ForeignKey("order.id"),
+        nullable=False
+    )
+
+    # Ingredient that was added to the pantry
+    ingredient_id = db.Column(
+        db.Integer,
+        db.ForeignKey("ingredient.id"),
+        nullable=False
+    )
+
+    # Amount added to the pantry
+    quantity = db.Column(db.Float, nullable=False)
+
+    # Unit of measurement (g, kg, ml, l, each etc)
+    unit = db.Column(db.String(50), nullable=False)
+
+    # Ingredient this item refers to
+    ingredient = db.relationship("Ingredient")

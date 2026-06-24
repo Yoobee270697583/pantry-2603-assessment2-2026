@@ -11,5 +11,15 @@
 </head>
 <body>
     {% block content %}{% endblock %}
+
+    <script>
+        setTimeout(function () {
+            document.querySelectorAll('.flash').forEach(function (msg) {
+                msg.classList.add('flash-hide');
+                setTimeout(function () { msg.remove(); }, 1000);
+            });
+        }, 2500);
+    </script>
+    
 </body>
 </html>
