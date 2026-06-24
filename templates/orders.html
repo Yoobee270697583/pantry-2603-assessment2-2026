@@ -2,17 +2,40 @@
 
 {% block title %}Previous Orders — Pantry{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>Previous Orders</h1>
-<p>This is the Previous Orders screen. Content coming soon.</p>
 
-<pre>
-### "Previous Orders"
-- An order is generated **only** when the user taps **"Add List To Pantry"** on the Shopping Lists screen — never automatically and with no separate "place order" step
-- That single action: updates Pantry inventory with the list items, clears the shopping list, and logs the order here
-- Each order records: date, items, quantities (and supermarket if relevant)
-- Acts as a historical log of what was "ordered"/restocked
-- Note: previously conceived as fed by supermarket cart integration (now removed); orders are now entirely user-driven via the Add List To Pantry action..
-</pre>
-
+{% if orders %}
+    {% for order in orders %}
+    <div class="card order-card">
+        <div class="card-body">
+            <h3 class="card-title">Order #{{ order.id }} — {{ order.ordered_at.strftime('%d %b %Y, %H:%M') }}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr>
+                        <td>{{ item.ingredient.name }}</td>
+                        <td>{{ "%.2f"|format(item.quantity) }}</td>
+                        <td>{{ unit_labels.get(item.unit, item.unit) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p class="empty-state">No orders yet — use "Add List To Pantry" on the Shopping List screen to create one.</p>
+{% endif %}
 {% endblock %}
