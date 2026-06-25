@@ -4,6 +4,8 @@ from models import Recipe, RecipeIngredient, db
 from api_helper import search_recipes, get_recipe_by_id, get_random_recipe, get_ingredients, filter_by_category, filter_by_area, get_or_create_recipe
 from forms import CustomRecipeForm, EditRecipeForm
 
+# searching TheMealDB, saved/created recipes, and saving/editing/deleting them
+
 recipes_bp = Blueprint("recipes", __name__)
 
 

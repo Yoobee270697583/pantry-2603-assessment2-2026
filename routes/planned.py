@@ -5,21 +5,22 @@ from models import MealPlan, Recipe, CookedMeal, db
 from api_helper import get_or_create_recipe
 from pantry_helper import sync_shopping_list, subtract_recipe_ingredients_from_pantry
 
+# meals a user has scheduled to cook, and marking them as cooked
+
 planned_bp = Blueprint("planned", __name__)
 
 
 @planned_bp.route("/planned")
 @login_required
 def planned():
-    # Retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
+    # oldest added first
     meal_plans = MealPlan.query.filter_by(user_id=current_user.id).order_by(MealPlan.id.asc()).all()
 
-    # Get and store the recipe data including img, all metadata - because it's not in the MealPlan model
+    # MealPlan doesn't store recipe details itself, so pull each recipe in alongside its plan
     planned_meals = []
 
     for meal in meal_plans:
         recipe = Recipe.query.get(meal.recipe_id)
-        # Put the retrieved meal_plans and recipes together into one variable
         planned_meals.append({"plan": meal, "recipe": recipe})
 
     return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
@@ -56,9 +57,8 @@ def add_saved_to_plan(recipe_id):
 @planned_bp.route("/planned/add_searched_to_plan/<meal_id>", methods=['POST'])
 @login_required
 def add_searched_to_plan(meal_id):
-    # Check the recipe is already in the user's saved meals tab. If not, save it first
-    # Either way, retieve the row for the reciple being added to planned meals, as saved_recipe
-    user_id=current_user.id
+    # save the recipe first if the user hasn't already, then plan it
+    user_id = current_user.id
     saved_recipe = get_or_create_recipe(user_id, meal_id)
 
     search_query = request.form.get("q") or None

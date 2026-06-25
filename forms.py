@@ -9,7 +9,7 @@ from constants import PANTRY_CATEGORY_CHOICES, PANTRY_UNIT_CHOICES
 # USER FORMS
 # ============================================================================
 
-# The RegisterForm class defines the fields and validation rules for the registration form using Flask-WTF and WTForms.
+# sign up form - checks passwords match and email isn't already taken
 class RegisterForm(FlaskForm):
     first_name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
     last_name = StringField(validators=[InputRequired(), Length(min=1, max =150)])
@@ -29,7 +29,7 @@ class RegisterForm(FlaskForm):
         if existing_user_email:
             raise ValidationError('An account using that email already exists. Please log in instead.')
 
-# The LoginForm class defines the fields and validation rules for the login form using Flask-WTF and WTForms.
+# login form
 class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Email(message='Invalid email'), Length(max=150)])
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=256)])
@@ -40,30 +40,18 @@ class LoginForm(FlaskForm):
 # PANTRY FORMS / CLASSES
 # ============================================================================
 
-    # form for creating a custom recipe
-class CustomRecipeForm(FlaskForm):
-    name = StringField(validators=[InputRequired(), Length(min=2, max=150)])
-    category = StringField(validators=[Optional(), Length(max=100)])
-    area = StringField(validators=[Optional(), Length(max=100)])
-    # one ingredient per line, format: "amount, ingredient name"
-    ingredients = TextAreaField(validators=[InputRequired()])
-    instructions = TextAreaField(validators=[InputRequired()])
-    submit = SubmitField('Save Recipe')
-
-# Add Pantry Item Form
+# add pantry item form
 class AddPantryItemForm(FlaskForm):
-    # Ingredient being added - must reference an existing Ingredient row,
-    # selected from the Ingredients tab rather than typed freely
+    # has to match a real Ingredient row - picked from the Ingredients tab, not typed in
     ingredient_id = HiddenField(validators=[InputRequired()])
-    # Pantry Item quantity, using FloatField to allow for decimal quantities (e.g., 1.5 cups)
+    # float so we can handle stuff like 1.5 cups
     quantity = FloatField(validators=[InputRequired()])
-    # Pantry Item category
     category = SelectField(
         "Category",
         choices=PANTRY_CATEGORY_CHOICES,
         validators=[InputRequired()]
     )
-    # Pantry Item unit, i.e. kg, g, ml, L, cup etc.
+    # kg, g, ml, L, cup etc - see PANTRY_UNIT_CHOICES
     unit = SelectField(
         "Unit",
         choices=PANTRY_UNIT_CHOICES,
@@ -88,10 +76,9 @@ class DeletePantryItemForm(FlaskForm):
 # SHOPPING LIST FORMS
 # ============================================================================
 
-# Manual "add item" form for the Shopping List screen
+# lets a user manually add an item to their shopping list
 class AddShoppingItemForm(FlaskForm):
-    # Ingredient being added - must reference an existing Ingredient row,
-    # selected from an ingredient search rather than typed freely
+    # same deal as AddPantryItemForm - must be a real Ingredient, picked from search
     ingredient_id = HiddenField(validators=[InputRequired()])
     quantity = FloatField(validators=[InputRequired()])
     unit = SelectField(

@@ -4,14 +4,13 @@ from models import db, Ingredient, PantryItem, MealPlan, Recipe, ShoppingListIte
 # ============================================================================
 # AMOUNT PARSING / UNIT SANITIZING
 # ============================================================================
-# Recipe ingredients come from TheMealDB as free text amounts like "400g",
-# "2 cups", "to taste". These helpers parse + sanitize that text into the
-# same unit vocabulary pantry items already use (see PANTRY_UNIT_CHOICES),
-# and then convert mass/volume units onto a common base unit (g or ml) so
-# that quantities can be compared/subtracted even when the recipe and the
-# pantry item use different (but compatible) units.
+# recipe amounts come from TheMealDB as free text like "400g", "2 cups",
+# "to taste". these helpers turn that text into numbers + units we
+# recognise (see PANTRY_UNIT_CHOICES), then convert everything to a
+# common base unit (g or ml) so we can compare/subtract pantry stock
+# against what a recipe needs even if the units don't match exactly.
 
-# tried in order: mixed number ("1 1/2 cups"), simple fraction ("1/2 cup"),
+# tried in order: mixed number ("1 1/2 cups"), fraction ("1/2 cup"),
 # then plain decimal/integer ("400g", "2 cups")
 MIXED_NUMBER_RE = re.compile(r"^\s*(\d+)\s+(\d+)\s*/\s*(\d+)\s*([a-zA-Z]*)")
 FRACTION_RE = re.compile(r"^\s*(\d+)\s*/\s*(\d+)\s*([a-zA-Z]*)")
@@ -32,9 +31,8 @@ UNIT_SYNONYMS = {
     "lb": "lb", "lbs": "lb", "pound": "lb", "pounds": "lb",
 }
 
-# prep/descriptor words that sometimes sit where a unit would (e.g. "1
-# chopped onion") - these describe how the ingredient is prepared, not
-# how much of it there is, so they're treated as if no unit was given
+# words like "1 chopped onion" - "chopped" isn't a unit, it just describes
+# the ingredient, so we treat these as if no unit was given at all
 NON_UNIT_WORDS = {
     "chopped", "diced", "sliced", "minced", "crushed", "grated", "ground",
     "peeled", "drained", "melted", "softened", "beaten", "sifted",
@@ -48,7 +46,7 @@ VOLUME_TO_ML = {"ml": 1, "l": 1000, "tsp": 5, "tbsp": 15, "cup": 240}
 
 
 def parse_amount(amount_str):
-    """Parses a free-text recipe amount like '400g', '2 cups', or '1 1/2 cups' into (quantity, raw_unit)."""
+    """Splits a free-text amount like '400g' or '1 1/2 cups' into (quantity, raw_unit)."""
     if not amount_str:
         return 1.0, ""
 
@@ -74,17 +72,13 @@ def parse_amount(amount_str):
 
 
 def normalize_unit(raw_unit):
-    """Sanitizes a free-text unit word into the pantry's unit vocabulary.
+    """Maps a free-text unit word onto our known unit vocabulary.
 
-    Recognized synonyms map onto the shared vocabulary so they can be
-    compared/converted. Unrecognized-but-present words (e.g. "bunch",
-    "clove") are kept as their own literal unit rather than being
-    collapsed into a single generic bucket - otherwise unrelated
-    descriptive measures (e.g. "1 bunch" and a bare "2") would get
-    summed together as if they were the same unit. A bare count with no
-    unit word at all (e.g. "2 onions" -> amount "2"), or a prep word that
-    isn't really a unit (e.g. "1 chopped onion"), is assumed to mean
-    "each".
+    Known synonyms (e.g. "grams" -> "g") get mapped so they can be
+    compared/converted. Unknown words (e.g. "bunch", "clove") are kept
+    as-is instead of being lumped together - we don't want "1 bunch"
+    and a bare "2" treated as the same unit. No unit at all, or a prep
+    word like "chopped", just means "each".
     """
     if not raw_unit:
         return "each"
@@ -95,12 +89,7 @@ def normalize_unit(raw_unit):
 
 
 def to_base(quantity, unit):
-    """Converts a (quantity, unit) into a common base unit when a safe conversion exists.
-
-    Mass units convert to grams, volume units convert to millilitres.
-    Count-style units (each, can, other) have no safe conversion and are
-    returned unchanged.
-    """
+    """Converts mass units to grams and volume units to mL. Count units (each, can, other) pass through unchanged."""
     if unit in MASS_TO_GRAMS:
         return quantity * MASS_TO_GRAMS[unit], "g"
     if unit in VOLUME_TO_ML:
@@ -109,14 +98,14 @@ def to_base(quantity, unit):
 
 
 def sanitize_amount(amount_str):
-    """Parses + normalizes + converts a recipe amount straight into pantry-comparable (quantity, unit)."""
+    """Runs a raw recipe amount through parse -> normalize -> base unit, all in one go."""
     quantity, raw_unit = parse_amount(amount_str)
     unit = normalize_unit(raw_unit)
     return to_base(quantity, unit)
 
 
 def find_matching_ingredient(name):
-    """Finds the canonical Ingredient row matching a recipe ingredient's free-text name."""
+    """Looks up the Ingredient row matching a recipe ingredient's name (case-insensitive)."""
     if not name:
         return None
     return Ingredient.query.filter(
@@ -129,7 +118,7 @@ def find_matching_ingredient(name):
 # ============================================================================
 
 def get_required_ingredients(user_id):
-    """Returns {(ingredient_id, base_unit): total_base_qty} needed across all of a user's planned meals."""
+    """Returns {(ingredient_id, base_unit): total_qty} needed across all of a user's planned meals."""
     needed = {}
 
     meal_plans = MealPlan.query.filter_by(user_id=user_id).all()
@@ -152,7 +141,7 @@ def get_required_ingredients(user_id):
 
 
 def get_pantry_stock_in_base_units(user_id):
-    """Returns {(ingredient_id, base_unit): total_base_qty} currently owned by a user."""
+    """Returns {(ingredient_id, base_unit): total_qty} currently sitting in a user's pantry."""
     stock = {}
 
     pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
@@ -165,12 +154,11 @@ def get_pantry_stock_in_base_units(user_id):
 
 
 def sync_shopping_list(user_id):
-    """Regenerates the auto (non-manual) shopping list rows for a user.
+    """Rebuilds the auto-generated part of a user's shopping list.
 
-    Computes ingredients required by all planned meals, subtracts what's
-    already in the pantry (compared in a common base unit), and replaces
-    every existing auto-generated ShoppingListItem with a fresh set
-    reflecting the current delta. Manually-added items are left untouched.
+    Works out what's needed for planned meals minus what's already in the
+    pantry, then replaces the old auto items with the fresh result.
+    Manually-added items are left alone.
     """
     needed = get_required_ingredients(user_id)
     stock = get_pantry_stock_in_base_units(user_id)
@@ -198,7 +186,7 @@ def sync_shopping_list(user_id):
 # ============================================================================
 
 def add_quantity_to_pantry(user_id, ingredient_id, quantity, unit, default_category="other"):
-    """Finds-or-creates a PantryItem for (user, ingredient, unit) and adds quantity onto it."""
+    """Adds quantity onto a user's PantryItem for this ingredient + unit, creating it if needed."""
     pantry_item = PantryItem.query.filter_by(
         user_id=user_id, ingredient_id=ingredient_id, unit=unit
     ).first()
@@ -218,10 +206,10 @@ def add_quantity_to_pantry(user_id, ingredient_id, quantity, unit, default_categ
 
 
 def subtract_recipe_ingredients_from_pantry(user_id, recipe):
-    """Subtracts a recipe's ingredients from the user's pantry, where a confident match exists.
+    """Takes a recipe's ingredients off the user's pantry stock when cooked.
 
-    Ingredients with no canonical Ingredient match, or whose pantry unit
-    family is incompatible with the recipe's unit, are skipped silently.
+    Skips anything we can't match to a known ingredient, or where the
+    pantry unit and recipe unit aren't compatible (e.g. g vs each).
     """
     for recipe_ingredient in recipe.ingredients:
         ingredient = find_matching_ingredient(recipe_ingredient.name)

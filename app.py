@@ -7,29 +7,24 @@ from routes import register_blueprints
 # ============================================================================
 # APPLICATION CONFIGURATION
 # ============================================================================
-# DB Debug
+
+# set to False to stop printing the table list on startup
 database_debug = True
 
-
-# Create the Flask application instance.
-# __name__ tells Flask where to look for templates/ and static/ folders.
+# __name__ tells Flask where to find the templates/ and static/ folders
 app = Flask(__name__)
 
-# Configures the SQLite database location
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///pantry.db"
-
-# Disable modification tracking for better performance
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  # don't need this, just saves memory
 app.config["SECRET_KEY"] = 'thisisasecretkey'
 
 # ============================================================================
 # DATABASE INITIALIZATION
 # ============================================================================
 
-# Connects SQLAlchemy to the Flask application instance
 db.init_app(app)
 
-# Create database tables if they do not exist
+# creates tables if they don't already exist - safe to run every startup
 with app.app_context():
     db.create_all()
 
@@ -39,9 +34,8 @@ with app.app_context():
             print(f"✅ {table}")
         print("=======================\n")
 
-    # one-time sync of the canonical ingredient list from TheMealDB so that
-    # pantry items can be validated against our own table instead of the
-    # live api on every request
+    # one-time sync of TheMealDB's ingredient list, so pantry items can be
+    # checked against our own table instead of hitting the live api every time
     if Ingredient.query.count() == 0:
         for ing in fetch_ingredient_list():
             db.session.add(Ingredient(
@@ -55,16 +49,14 @@ with app.app_context():
 # LOGIN MANAGER
 # ============================================================================
 
-# create a Login Manager Object, stored to login_manager variable, and initialize it with the Flask app.
 login_manager = LoginManager()
 login_manager.init_app(app)
-# Tell the login_manager the name of the view function that handles logins, so it can redirect users there when they need to log in.
+# where to send people if they try to access a @login_required page while logged out
 login_manager.login_view = 'auth.login'
 
 
-# Tell the login_manager how to load a user from the database, given the user's id.
-# It does this automatically for every request where a session cookie exists, and sets the result to current_user
-# Makes it available as current_user in all our routes and templates.
+# flask-login calls this on every request to turn the session cookie into a
+# real User, which then shows up as current_user everywhere
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))

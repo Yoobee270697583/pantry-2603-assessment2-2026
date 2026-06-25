@@ -5,6 +5,8 @@ from constants import UNIT_LABELS
 from forms import AddShoppingItemForm, ShoppingItemActionForm
 from pantry_helper import add_quantity_to_pantry
 
+# shopping list view, manual add/update/delete, and checking out into the pantry
+
 shopping_bp = Blueprint("shopping", __name__)
 
 
@@ -62,7 +64,7 @@ def update_shopping_item(item_id):
     item = ShoppingListItem.query.filter_by(id=item_id, user_id=current_user.id).first_or_404()
 
     direction = request.form.get("direction")
-    step = 1 if item.quantity >= 1 else 0.1
+    step = 1 if item.quantity >= 1 else 0.1  # smaller step once we're below 1 unit
 
     if direction == "increase":
         item.quantity += step

@@ -1,3 +1,5 @@
+# wires up every blueprint onto the app - app.py just calls register_blueprints(app)
+
 from routes.auth import auth_bp
 from routes.kitchen import kitchen_bp
 from routes.pantry import pantry_bp

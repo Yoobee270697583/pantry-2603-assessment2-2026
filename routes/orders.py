@@ -3,6 +3,8 @@ from flask_login import current_user, login_required
 from models import Order
 from constants import UNIT_LABELS
 
+# read-only history of shopping lists that were checked out into the pantry
+
 orders_bp = Blueprint("orders", __name__)
 
 

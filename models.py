@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from constants import CATEGORY_LABELS, UNIT_LABELS
 
-# Database instance
+# the SQLAlchemy db instance, shared across the whole app
 db = SQLAlchemy()
 
 # ============================================================================
@@ -10,39 +10,34 @@ db = SQLAlchemy()
 # ============================================================================
 
 class User(UserMixin, db.Model):
-    """
-    Stores user account information.
+    """A user account. Owns pantry items, recipes, meal plans, and cooked meals."""
 
-    Each user can own multiple pantry items,
-    recipes, meal plans, and cooked meals.
-    """
-
-    # Primary Key
+    # primary key
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(150), nullable=False)
     last_name = db.Column(db.String(150), nullable=False)
 
-    # User email address
+    # user's email address
     email = db.Column(
         db.String(120), 
         unique=True, 
         nullable=False
     )
 
-    # Hashed password
+    # hashed password, never store plain text
     password = db.Column(
         db.String(255), 
         nullable=False
     )
 
-    # Pantry items owned by this user
+    # pantry items owned by this user
     pantry_items = db.relationship(
         "PantryItem",
         backref="owner",
         lazy=True
     )
 
-    # Recipes saved by this user
+    # recipes saved by this user
     recipes = db.relationship(
         "Recipe",
         backref="owner",
@@ -50,29 +45,26 @@ class User(UserMixin, db.Model):
     )
 
 class Ingredient(db.Model):
-    """
-    Canonical ingredient list, synced from TheMealDB.
-    PantryItem and RecipeIngredient reference this table so that
-    pantry items and recipe ingredients can be matched reliably.
-    """
+    """The master ingredient list, synced from TheMealDB. PantryItem and
+    RecipeIngredient both point back here so we can match them up reliably."""
 
-    # Primary Key
+    # primary key
     id = db.Column(db.Integer, primary_key=True)
 
     # idIngredient from TheMealDB
     mealdb_id = db.Column(db.String(50), unique=True)
 
-    # Ingredient name
+    # ingredient name
     name = db.Column(
         db.String(150),
         nullable=False,
         unique=True
     )
 
-    # Thumbnail from TheMealDB
+    # thumbnail image from TheMealDB
     image_url = db.Column(db.String(500))
 
-    # Pantry items referencing this ingredient
+    # pantry items referencing this ingredient
     pantry_items = db.relationship(
         "PantryItem",
         backref="ingredient",
@@ -80,45 +72,42 @@ class Ingredient(db.Model):
     )
 
 class PantryItem(db.Model):
-    """
-    Represents an ingredient stored in a user's pantry.
-    Used when getting shopping lists and suggesting recipes
-    """
+    """An ingredient a user currently has in stock. Used for shopping lists and recipe suggestions."""
 
-    # Primary Key
+    # primary key
     id = db.Column(db.Integer, primary_key=True)
 
-    # Ingredient this pantry item refers to - must exist in Ingredient table
+    # ingredient this refers to - must exist in the Ingredient table
     ingredient_id = db.Column(
         db.Integer,
         db.ForeignKey("ingredient.id"),
         nullable=False
     )
 
-    # Item category
+    # item category
     category = db.Column(
         db.String(100),
         nullable = False
     )
 
-    # Amount currently owned
+    # amount currently owned
     quantity = db.Column(
         db.Float, 
         nullable=False
     )
 
-    # Unit of measurement (kg, g, L, mL etc)
+    # unit of measurement (kg, g, L, mL etc)
     unit = db.Column(
         db.String(50),
         nullable=False
     )
 
-    # Optional expiry date
+    # optional expiry date
     expiry_date = db.Column(
         db.Date
     )
 
-    # Links pantry item to a user
+    # links this pantry item to a user
     user_id = db.Column(
         db.Integer, 
         db.ForeignKey("user.id"), 
@@ -127,39 +116,35 @@ class PantryItem(db.Model):
 
     @property
     def category_label(self):
-        """Returns the display label for the stored category value."""
+        """Display-friendly version of the stored category, e.g. "fruit_veg" -> "Fruit & Vegetables"."""
         return CATEGORY_LABELS.get(self.category, self.category)
-    
+
     @property
     def unit_label(self):
-        """Returns the display label for the stored unit value."""
+        """Display-friendly version of the stored unit, e.g. "ml" -> "mL"."""
         return UNIT_LABELS.get(self.unit, self.unit)
 
 class RecipeIngredient(db.Model):
-    """
-    Represents ingredients required for recipe.
-    Will use to comapare ingredients required to the ingredients
-    that the user already owns in their pantry i.e. pantry_items
-    """
+    """One ingredient line on a recipe. Compared against pantry_items to see what a user's missing."""
 
-    # Primary Key
+    # primary key
     id = db.Column(
         db.Integer,
         primary_key=True
     )
     
-    # Ingredient Name
+    # ingredient name
     name = db.Column(
         db.String(100),
         nullable=False
     )
 
-    # Ingredient amount from TheMealDB
+    # ingredient amount, as text, from TheMealDB
     amount = db.Column(
         db.String(100)
     )
 
-    # Recipe this ingredient belongs to
+    # recipe this ingredient belongs to
     recipe_id = db.Column(
         db.Integer,
         db.ForeignKey("recipe.id"),
@@ -167,57 +152,54 @@ class RecipeIngredient(db.Model):
     )
 
 class Recipe(db.Model):
-    """
-    Represents stored recipes saved by the user.
-    Recipes may come from TheMealDB or be manually created
-    """
-    # Primary DB ID Key
+    """A recipe saved by a user - either pulled from TheMealDB or written by hand."""
+    # primary key
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    # External ID from mealdb if it exists
+    # mealdb's own id for this recipe, if it came from there
     mealdb_id = db.Column(db.String(50))
 
-    # Recipe name
+    # recipe name
     name = db.Column(db.String(150), nullable=False)
 
-    # Recipe Category
+    # recipe category
     category = db.Column(db.String(100))
 
-    # Recipe Origin Country 
+    # recipe's country of origin 
     area = db.Column(db.String(100))
 
-    # Recipe Instructions
+    # recipe instructions
     instructions = db.Column(db.Text)
 
-    # Recipe Thumbnail
+    # recipe thumbnail image
     image_url = db.Column(db.String(500))
 
-    # Recipe youtube link 
+    # recipe youtube link 
     youtube_url = db.Column(db.String(500))
 
-    # Recipe source, will be either TheMealDB or Custom
+    # where the recipe came from - TheMealDB or Custom
     source = db.Column(
         db.String(50),
         default="TheMealDB"
     )
 
-    # User that saved the recipe
+    # user that saved the recipe
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
     
-    # Date recipe was saved
+    # date recipe was saved
     created_at = db.Column(
         db.DateTime,
         default=db.func.current_timestamp()
     )
 
-    # Ingredients required for this recipe
+    # ingredients required for this recipe
     ingredients = db.relationship(
         "RecipeIngredient",
         backref="recipe",
@@ -226,30 +208,28 @@ class Recipe(db.Model):
     )
 
 class MealPlan(db.Model):
-    """
-    Stores recipes planned for a specific date
-    """
+    """A recipe a user has scheduled to cook on a given date."""
 
-    # Primary key
+    # primary key
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    # Date meal is planned for
+    # date meal is planned for
     planned_date = db.Column(
         db.Date,
         nullable=False
     )
 
-    # User that created the plan
+    # user that created the plan
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
 
-    # Recipe assigned to that date
+    # recipe assigned to that date
     recipe_id = db.Column(
         db.Integer,
         db.ForeignKey("recipe.id"),
@@ -257,30 +237,28 @@ class MealPlan(db.Model):
     )
 
 class CookedMeal(db.Model):
-    """
-    Stores meals that have been cooked.
-    """
+    """A log entry for a meal that's actually been cooked."""
 
-    # Primary Key
+    # primary key
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    # Date meal was cooked
+    # date meal was cooked
     cooked_date = db.Column(
         db.DateTime,
         default=db.func.current_timestamp()
     )
 
-    # User who cooked the meal
+    # user who cooked the meal
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
 
-    # Recipe that was cooked
+    # recipe that was cooked
     recipe_id = db.Column(
         db.Integer,
         db.ForeignKey("recipe.id"),
@@ -288,65 +266,59 @@ class CookedMeal(db.Model):
     )
 
 class ShoppingListItem(db.Model):
-    """
-    Represents a single item on a user's shopping list.
-    Auto-generated items (is_manual=False) are regenerated whenever the
-    user's planned meals or pantry stock changes; manually added items
-    are left untouched by that resync.
-    """
+    """One item on a user's shopping list. Auto items (is_manual=False) get
+    regenerated whenever planned meals or pantry stock changes; manual
+    items are left alone."""
 
-    # Primary Key
+    # primary key
     id = db.Column(db.Integer, primary_key=True)
 
-    # User this shopping list item belongs to
+    # user this item belongs to
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
 
-    # Ingredient this item refers to - must exist in Ingredient table
+    # ingredient this refers to - must exist in the Ingredient table
     ingredient_id = db.Column(
         db.Integer,
         db.ForeignKey("ingredient.id"),
         nullable=False
     )
 
-    # Amount needed
+    # amount needed
     quantity = db.Column(db.Float, nullable=False)
 
-    # Unit of measurement (g, kg, ml, l, each etc)
+    # unit of measurement (g, kg, ml, l, each etc)
     unit = db.Column(db.String(50), nullable=False)
 
-    # False for items derived from planned meals, True for user-added items
+    # false for items derived from planned meals, true for user-added items
     is_manual = db.Column(db.Boolean, default=False, nullable=False)
 
-    # Ingredient this item refers to
+    # ingredient this item refers to
     ingredient = db.relationship("Ingredient")
 
 class Order(db.Model):
-    """
-    Historical log of shopping lists that were applied to the pantry
-    via the "Add List To Pantry" action.
-    """
+    """A record of a shopping list that's been added to the pantry."""
 
-    # Primary Key
+    # primary key
     id = db.Column(db.Integer, primary_key=True)
 
-    # User who placed the order
+    # user who placed the order
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
 
-    # Date/time the order was placed
+    # date/time the order was placed
     ordered_at = db.Column(
         db.DateTime,
         default=db.func.current_timestamp()
     )
 
-    # Items included in this order
+    # items included in this order
     items = db.relationship(
         "OrderItem",
         backref="order",
@@ -355,33 +327,30 @@ class Order(db.Model):
     )
 
 class OrderItem(db.Model):
-    """
-    Snapshot of a single ingredient/quantity added to the pantry as part
-    of an Order.
-    """
+    """One ingredient + quantity that was part of an Order."""
 
-    # Primary Key
+    # primary key
     id = db.Column(db.Integer, primary_key=True)
 
-    # Order this item belongs to
+    # order this item belongs to
     order_id = db.Column(
         db.Integer,
         db.ForeignKey("order.id"),
         nullable=False
     )
 
-    # Ingredient that was added to the pantry
+    # ingredient that was added to the pantry
     ingredient_id = db.Column(
         db.Integer,
         db.ForeignKey("ingredient.id"),
         nullable=False
     )
 
-    # Amount added to the pantry
+    # amount added to the pantry
     quantity = db.Column(db.Float, nullable=False)
 
-    # Unit of measurement (g, kg, ml, l, each etc)
+    # unit of measurement (g, kg, ml, l, each etc)
     unit = db.Column(db.String(50), nullable=False)
 
-    # Ingredient this item refers to
+    # ingredient this item refers to
     ingredient = db.relationship("Ingredient")

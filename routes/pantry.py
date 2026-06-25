@@ -4,6 +4,8 @@ from models import PantryItem, Ingredient, db
 from constants import PANTRY_CATEGORY_CHOICES, CATEGORY_LABELS
 from forms import AddPantryItemForm, DeletePantryItemForm
 
+# viewing/searching the pantry, browsing ingredients, and adding/editing/deleting pantry items
+
 pantry_bp = Blueprint("pantry", __name__)
 
 
@@ -93,7 +95,7 @@ def add_pantry_item():
             db.session.add(new_pantry_item)
             db.session.commit()
             flash('Pantry item added successfully! ✅')
-            return redirect(url_for('pantry.pantry'))  # redirect after success
+            return redirect(url_for('pantry.pantry'))
         except Exception:
             db.session.rollback()
             flash('Something went wrong adding the pantry item. Please try again.', 'error')

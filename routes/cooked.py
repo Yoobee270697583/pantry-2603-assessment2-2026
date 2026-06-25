@@ -4,24 +4,23 @@ from flask_login import current_user, login_required
 from models import CookedMeal, Recipe, MealPlan, db
 from pantry_helper import sync_shopping_list
 
+# history of meals that have actually been cooked
+
 cooked_bp = Blueprint("cooked", __name__)
 
 
 @cooked_bp.route("/cooked")
 @login_required
 def cooked():
-
-    # Retrieve all cooked meals for the current user, ordered by ascending or oldest/lowest id - which means oldest cooked to newest cooked meals
+    # oldest cooked first
     all_cooked_meals = CookedMeal.query.filter_by(user_id=current_user.id).order_by(CookedMeal.id.asc()).all()
 
-    # Get and store the recipe data including img, all metadata - because it's not in the CookedMeal model
+    # CookedMeal doesn't store recipe details itself, so pull each recipe in alongside it
     cooked_meals = []
     for meal in all_cooked_meals:
         recipe = Recipe.query.get(meal.recipe_id)
-        # Put the retrieved meal_plans and recipes together into one variable
         cooked_meals.append({"cooked": meal, "recipe": recipe})
 
-    # Pass the data to the template
     return render_template("cooked.html", active_page="cooked", cooked_meals=cooked_meals)
 
 
