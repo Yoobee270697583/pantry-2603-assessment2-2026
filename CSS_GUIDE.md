@@ -17,7 +17,7 @@ Purpose: document where styles live, which responsibilities belong in each file,
 
 Guideline: keep selectors local to their responsibility — no layout rules in page CSS, no page-specific rules in `base.css`. If a class is genuinely shared across 3+ pages (not just visually similar but the *same* component), it belongs in `base.css`, not duplicated.
 
-**Known duplication (accepted, not yet cleaned up):** `shopping.css` duplicates a handful of small selectors from `recipes.css` (`.tag`, `.empty-state`, `.search-error`) because `shopping.html`/`orders.html` don't load `recipes.css`. If you touch any of these three classes, **update both `recipes.css` and `shopping.css`**, or better — promote them into `base.css` and delete both copies, since they're used by enough pages now to count as shared primitives.
+**Known duplication:** `.empty-state` and `.search-error` were duplicated across `recipes.css`/`shopping.css` and have since been promoted into `base.css` (along with `.search-input`, `.btn-search`, `.filter-bar`/`.filter-select`/`.filter-clear`, and `.back-link`) since they're used widely enough to count as shared primitives. `.tag` is still defined separately in both `recipes.css` and `shopping.css` on purpose — the shopping-list version is a smaller inline label, the recipe version is a bigger pill, so they're genuinely different components that happen to share a name.
 
 ---
 

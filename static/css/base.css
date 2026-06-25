@@ -56,9 +56,14 @@ select {
 }
 
 .btn-danger {
-    background: var(--bg) ;
+    background: var(--surface);
     color: var(--danger);
     border-color: var(--danger);
+}
+
+.btn-danger:hover {
+    background: var(--danger);
+    color: #fff;
 }
 
 table {
@@ -107,6 +112,27 @@ table tbody tr:hover td {
     color: #2f7d57;
     font-size: 0.9rem;
     font-weight: 500;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* ---- error / empty state messages ---- */
+
+.search-error {
+    color: #c0392b;
+    background: #fdf0ef;
+    border: 1px solid #f5c6c2;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    color: #6b7a6e;
+    margin-top: 8px;
 }
 
 /* Flash Messages */
@@ -250,10 +276,12 @@ table tbody tr:hover td {
     padding: 8px 16px;
     background: #2f7d57;
     color: #fff;
+    border: none;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
+    cursor: pointer;
 }
 
 /* ---- filter bar ---- */
