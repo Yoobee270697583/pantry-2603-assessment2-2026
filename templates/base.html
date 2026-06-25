@@ -17,18 +17,18 @@
     <!-- Desktop Style Left Bar Main Navigation (tablet viewport & up) -->
     <nav class="left-nav">
         <header class="left-nav-logo">
-            <a href="{{ url_for('kitchen') }}">Pantry</a>
+            <a href="{{ url_for('kitchen.kitchen') }}">Pantry</a>
         </header>
 
         <ul class="left-nav-links">
-            <li><a href="{{ url_for('kitchen') }}"        class="{{ 'is-active' if active_page == 'kitchen' }}">My Kitchen</a></li>
-            <li><a href="{{ url_for('pantry') }}"      class="{{ 'is-active' if active_page == 'pantry' }}">My Pantry</a></li>
-            <li><a href="{{ url_for('recipes') }}"     class="{{ 'is-active' if active_page == 'recipes' }}">My Recipes</a></li>
-            <li><a href="{{ url_for('suggestions') }}" class="{{ 'is-active' if active_page == 'suggestions' }}">Suggested Recipes</a></li>
-            <li><a href="{{ url_for('planned') }}"     class="{{ 'is-active' if active_page == 'planned' }}">Planned Meals</a></li>
-            <li><a href="{{ url_for('cooked') }}"      class="{{ 'is-active' if active_page == 'cooked' }}">Cooked Meals</a></li>
-            <li><a href="{{ url_for('shopping') }}"    class="{{ 'is-active' if active_page == 'shopping' }}">Shopping Lists</a></li>
-            <li><a href="{{ url_for('orders') }}"      class="{{ 'is-active' if active_page == 'orders' }}">Previous Orders</a></li>
+            <li><a href="{{ url_for('kitchen.kitchen') }}"        class="{{ 'is-active' if active_page == 'kitchen' }}">My Kitchen</a></li>
+            <li><a href="{{ url_for('pantry.pantry') }}"      class="{{ 'is-active' if active_page == 'pantry' }}">My Pantry</a></li>
+            <li><a href="{{ url_for('recipes.recipes') }}"     class="{{ 'is-active' if active_page == 'recipes' }}">My Recipes</a></li>
+            <li><a href="{{ url_for('suggestions.suggestions') }}" class="{{ 'is-active' if active_page == 'suggestions' }}">Suggested Recipes</a></li>
+            <li><a href="{{ url_for('planned.planned') }}"     class="{{ 'is-active' if active_page == 'planned' }}">Planned Meals</a></li>
+            <li><a href="{{ url_for('cooked.cooked') }}"      class="{{ 'is-active' if active_page == 'cooked' }}">Cooked Meals</a></li>
+            <li><a href="{{ url_for('shopping.shopping') }}"    class="{{ 'is-active' if active_page == 'shopping' }}">Shopping Lists</a></li>
+            <li><a href="{{ url_for('orders.orders') }}"      class="{{ 'is-active' if active_page == 'orders' }}">Previous Orders</a></li>
         </ul>
 
         <!-- Account area. Settings / Log out menu to be added later. -->
@@ -41,7 +41,7 @@
 
             <div class="account-menu hidden" id="accountMenu">
                 <a href="#">Settings</a>
-                <a href="{{ url_for('logout') }}">Log out</a>
+                <a href="{{ url_for('auth.logout') }}">Log out</a>
             </div>
         </footer>
     </nav>
@@ -63,11 +63,11 @@
 
     <!-- Mobile Style, Bottom Bar Main Navigation (mobile only) -->
     <nav class="bottom-nav">
-        <a href="{{ url_for('kitchen') }}"     class="{{ 'is-active' if active_page == 'kitchen' }}">Home</a>
-        <a href="{{ url_for('pantry') }}"   class="{{ 'is-active' if active_page == 'pantry' }}">Pantry</a>
-        <a href="{{ url_for('recipes') }}"  class="{{ 'is-active' if active_page in ['recipes', 'suggestions'] }}">Recipes</a>
-        <a href="{{ url_for('planned') }}"  class="{{ 'is-active' if active_page in ['planned', 'cooked'] }}">Meals</a>
-        <a href="{{ url_for('shopping') }}" class="{{ 'is-active' if active_page in ['shopping', 'orders'] }}">Shopping</a>
+        <a href="{{ url_for('kitchen.kitchen') }}"     class="{{ 'is-active' if active_page == 'kitchen' }}">Home</a>
+        <a href="{{ url_for('pantry.pantry') }}"   class="{{ 'is-active' if active_page == 'pantry' }}">Pantry</a>
+        <a href="{{ url_for('recipes.recipes') }}"  class="{{ 'is-active' if active_page in ['recipes', 'suggestions'] }}">Recipes</a>
+        <a href="{{ url_for('planned.planned') }}"  class="{{ 'is-active' if active_page in ['planned', 'cooked'] }}">Meals</a>
+        <a href="{{ url_for('shopping.shopping') }}" class="{{ 'is-active' if active_page in ['shopping', 'orders'] }}">Shopping</a>
     </nav>
 
     <script>

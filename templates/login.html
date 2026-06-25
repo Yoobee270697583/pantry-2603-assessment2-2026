@@ -18,7 +18,7 @@
         <h1>Pantry</h1>
         <p class="tagline">Use More. Waste Less.</p>
 
-        <form action="{{ url_for('login') }}" method="POST">
+        <form action="{{ url_for('auth.login') }}" method="POST">
             {{ form.hidden_tag() }}
 
             <div class="form-field">
@@ -40,7 +40,7 @@
             <button class="btn-primary" type="submit">Log In</button>
         </form>
 
-        <p class="auth-link">Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a>.</p>
+        <p class="auth-link">Don't have an account? <a href="{{ url_for('auth.register') }}">Sign Up</a>.</p>
     </section>
 </main>
 {% endblock %}

@@ -7,7 +7,7 @@
 {% block content %}
 <div class="page-header">
     <h1>Add {{ ingredient.name }} to Pantry</h1>
-    <a href="{{ url_for('pantry', tab='ingredients') }}" class="back-link">← back to pantry</a>
+    <a href="{{ url_for('pantry.pantry', tab='ingredients') }}" class="back-link">← back to pantry</a>
 </div>
 <form method="POST">
     {{ form.hidden_tag() }}

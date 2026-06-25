@@ -10,9 +10,9 @@
 
 <!-- back link goes to suggestions or recipes depending on where the user came from -->
 {% if back == 'suggestions' %}
-    <a href="{{ url_for('suggestions') }}" class="back-link">← back to suggested recipes</a>
+    <a href="{{ url_for('suggestions.suggestions') }}" class="back-link">← back to suggested recipes</a>
 {% else %}
-    <a href="{{ url_for('recipes', tab='search') }}" class="back-link">← back to recipes</a>
+    <a href="{{ url_for('recipes.recipes', tab='search') }}" class="back-link">← back to recipes</a>
 {% endif %}
 
 <div class="recipe-header">
@@ -28,7 +28,7 @@
             {% if is_saved %}
                 <span class="btn-saved">✓ Saved</span>
             {% else %}
-                <form action="{{ url_for('save_recipe', meal_id=meal.idMeal) }}" method="POST">
+                <form action="{{ url_for('recipes.save_recipe', meal_id=meal.idMeal) }}" method="POST">
                     <button type="submit" class="btn-save">Save Recipe</button>
                 </form>
             {% endif %}

@@ -12,7 +12,7 @@
     <h1>Shopping List</h1>
     <div class="page-header-actions">
         {% if shopping_items %}
-        <form action="{{ url_for('checkout_shopping_list') }}" method="POST">
+        <form action="{{ url_for('shopping.checkout_shopping_list') }}" method="POST">
             {{ action_form.hidden_tag() }}
             <button type="submit" class="btn-rounded">Add List To Pantry</button>
         </form>
@@ -38,13 +38,13 @@
             <td>{{ item.ingredient.name }}{% if item.is_manual %} <span class="tag">manual</span>{% endif %}</td>
             <td>
                 <div class="qty-stepper">
-                    <form action="{{ url_for('update_shopping_item', item_id=item.id) }}" method="POST">
+                    <form action="{{ url_for('shopping.update_shopping_item', item_id=item.id) }}" method="POST">
                         {{ action_form.hidden_tag() }}
                         <input type="hidden" name="direction" value="decrease">
                         <button type="submit" class="btn-icon" aria-label="Decrease quantity">-</button>
                     </form>
                     <span class="qty-value">{{ "%.2f"|format(item.quantity) }}</span>
-                    <form action="{{ url_for('update_shopping_item', item_id=item.id) }}" method="POST">
+                    <form action="{{ url_for('shopping.update_shopping_item', item_id=item.id) }}" method="POST">
                         {{ action_form.hidden_tag() }}
                         <input type="hidden" name="direction" value="increase">
                         <button type="submit" class="btn-icon" aria-label="Increase quantity">+</button>
@@ -54,11 +54,11 @@
             <td>{{ unit_labels.get(item.unit, item.unit) }}</td>
             <td>
                 <div class="item-actions">
-                    <form action="{{ url_for('add_shopping_item_to_pantry', item_id=item.id) }}" method="POST">
+                    <form action="{{ url_for('shopping.add_shopping_item_to_pantry', item_id=item.id) }}" method="POST">
                         {{ action_form.hidden_tag() }}
                         <button type="submit" class="btn-secondary ingredient-card-action">Add to Pantry</button>
                     </form>
-                    <form action="{{ url_for('delete_shopping_item', item_id=item.id) }}" method="POST">
+                    <form action="{{ url_for('shopping.delete_shopping_item', item_id=item.id) }}" method="POST">
                         {{ action_form.hidden_tag() }}
                         <button type="submit" class="btn-icon btn-icon--danger">
                             <i class="fa-solid fa-trash"></i>
@@ -79,7 +79,7 @@
 </div>
 
 <div class="toolbar">
-    <form action="{{ url_for('shopping') }}" method="GET" class="search-form">
+    <form action="{{ url_for('shopping.shopping') }}" method="GET" class="search-form">
         <input
             type="text"
             name="q"
@@ -102,7 +102,7 @@
         {% endif %}
         <div class="card-body">
             <h3 class="card-title">{{ ing.name }}</h3>
-            <form action="{{ url_for('add_shopping_item') }}" method="POST" class="manual-add-form">
+            <form action="{{ url_for('shopping.add_shopping_item') }}" method="POST" class="manual-add-form">
                 {{ add_form.csrf_token }}
                 <input type="hidden" name="ingredient_id" value="{{ ing.id }}">
                 <input type="number" name="quantity" step="0.1" min="0.1" value="1" class="manual-add-qty" required>

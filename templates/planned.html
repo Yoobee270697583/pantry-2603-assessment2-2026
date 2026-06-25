@@ -15,7 +15,7 @@
         <div class="grid">
             {% for item in planned_meals %}
             <div class="recipe-plan-wrapper">
-                <a href="{{ url_for('saved_recipe_detail', recipe_id=item.recipe.id) }}" class="card">
+                <a href="{{ url_for('recipes.saved_recipe_detail', recipe_id=item.recipe.id) }}" class="card">
                     {% if item.recipe.image_url %}
                         <img src="{{ item.recipe.image_url }}" alt="{{ item.recipe.name }}" class="card-img">
                     {% else %}
@@ -29,10 +29,10 @@
                         <p class="card-source">{{ item.recipe.source }}</p>
                     </div>
                 </a>
-                <form action="{{ url_for('mark_as_cooked', item_id=item.plan.id) }}" method="POST">
+                <form action="{{ url_for('planned.mark_as_cooked', item_id=item.plan.id) }}" method="POST">
                     <button type="submit" class="btn-submit">Cook This Meal</button>
                 </form>
-                <form action="{{ url_for('delete_planned_meal', item_id=item.plan.id) }}" method="POST">
+                <form action="{{ url_for('planned.delete_planned_meal', item_id=item.plan.id) }}" method="POST">
                     <button type="submit" class="btn-submit btn-danger">Remove from Planned Meals</button>
                 </form>
             </div>
