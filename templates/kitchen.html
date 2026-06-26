@@ -70,4 +70,32 @@
         <p>nothing expiring that you can fully make right now</p>
     {% endif %}
 
+    <h2>Planned Meals:</h2>
+    {% if planned_meals %}
+    <p>Some of your currently planned meals can be seen below:</p>
+        <p class="results-count">{{ planned_meals | length }} Planned Meal(s)</p>
+        <div class="grid">
+            {% for item in planned_meals[:6] %}
+            <div class="recipe-plan-wrapper">
+                <a href="{{ url_for('saved_recipe_detail', recipe_id=item.recipe.id) }}" class="card">
+                    {% if item.recipe.image_url %}
+                        <img src="{{ item.recipe.image_url }}" alt="{{ item.recipe.name }}" class="card-img">
+                    {% else %}
+                        <div class="card-no-img">No Image</div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h3 class="card-title">{{ item.recipe.name }}</h3>
+                        {% if item.recipe.category or item.recipe.area %}
+                            <p class="card-meta">{{ item.recipe.category }}{% if item.recipe.category and item.recipe.area %} · {% endif %}{{ item.recipe.area }}</p>
+                        {% endif %}
+                        <p class="card-source">{{ item.recipe.source }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No planned meals yet - head over to My Recipes and hit the "Plan this meal" to start your meal plan</p>
+    {% endif %}
+
 {% endblock %}

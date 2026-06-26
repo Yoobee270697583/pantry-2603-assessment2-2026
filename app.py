@@ -152,7 +152,9 @@ def kitchen():
                     
     suggested_recipes = get_recipes_using_expiring(user_id, expiring_soon)
     
-    return render_template("kitchen.html", active_page="kitchen", expiring_soon=expiring_soon, suggested_recipes=suggested_recipes)
+    planned_meals = get_meal_plans()
+    
+    return render_template("kitchen.html", active_page="kitchen", expiring_soon=expiring_soon, suggested_recipes=suggested_recipes, planned_meals=planned_meals)
 
 
 # Pantry functionalities
@@ -629,10 +631,8 @@ def suggestions_refresh():
     return redirect(url_for("suggestions"))
 
 
-@app.route("/planned")
-@login_required
-def planned():
-    # Retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
+def get_meal_plans():
+        # Retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
     meal_plans = MealPlan.query.filter_by(user_id=current_user.id).order_by(MealPlan.id.asc()).all()
     
     # Get and store the recipe data including img, all metadata - because it's not in the MealPlan model
@@ -643,7 +643,15 @@ def planned():
         # Put the retrieved meal_plans and recipes together into one variable     
         planned_meals.append({"plan": meal, "recipe": recipe})
         
-    return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
+    return planned_meals
+
+@app.route("/planned")
+@login_required
+def planned():
+ 
+    all_planned_meals = get_meal_plans()
+        
+    return render_template("planned.html", active_page="planned", planned_meals=all_planned_meals)
     
     
 @app.route("/planned/add_saved_to_plan/<int:recipe_id>", methods=['POST'])
