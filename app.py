@@ -118,7 +118,17 @@ def register():
 @app.route("/kitchen")
 @login_required
 def kitchen():
-    return render_template("kitchen.html", active_page="kitchen")
+    
+    expiring_soon = PantryItem.query.filter_by(owner=current_user)  .filter(
+                    PantryItem.expiry_date != None)                 .filter(
+                    PantryItem.expiry_date >= date.today())         .order_by(
+                    PantryItem.expiry_date.asc())                   .limit(15)
+                    
+    
+    
+    return render_template("kitchen.html", active_page="kitchen", expiring_soon=expiring_soon)
+
+
 
 # Pantry functionalities
 @app.route("/pantry")
@@ -503,12 +513,36 @@ def create_recipe():
     return render_template("create_recipe.html", active_page="recipes", form=form)
 
 
+def get_makable_recipes(user_id):
+    # get all pantry ingredient names for this user
+    pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
+    pantry_item_names = set(item.ingredient.name.lower() for item in pantry_items)
+
+    if not pantry_item_names:
+        return []
+
+    # get all saved TheMealDB recipes with their stored ingredients
+    saved_recipes = Recipe.query.filter_by(user_id=user_id, source="TheMealDB").all()
+
+    if not saved_recipes:
+        return []
+
+    # check which recipes have at least one ingredient in the pantry
+    makable_recipes = []
+    for recipe in saved_recipes:
+        ingredient_names = set(i.name.lower() for i in recipe.ingredients)
+        if ingredient_names <= pantry_item_names:
+            makable_recipes.append(recipe)
+
+    return makable_recipes
+
+
 def get_random_suggested_recipe(user_id):
     # get all pantry ingredient names for this user
     pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
-    pantry_names = set(item.ingredient.name.lower() for item in pantry_items)
+    pantry_item_names = set(item.ingredient.name.lower() for item in pantry_items)
 
-    if not pantry_names:
+    if not pantry_item_names:
         return None
 
     # get all saved TheMealDB recipes with their stored ingredients
@@ -520,8 +554,8 @@ def get_random_suggested_recipe(user_id):
     # count how many of each recipe's ingredients are in the pantry
     recipe_scores = []
     for recipe in saved_recipes:
-        recipe_ingredient_names = set(i.name.lower() for i in recipe.ingredients)
-        matches = len(pantry_names & recipe_ingredient_names)
+        ingredient_names = set(i.name.lower() for i in recipe.ingredients)
+        matches = len(pantry_item_names & ingredient_names)
         recipe_scores.append((recipe, matches))
 
     # only keep recipes that match at least one pantry item
@@ -530,24 +564,25 @@ def get_random_suggested_recipe(user_id):
     if not matched:
         return None
 
-    # find the highest match count then pick randomly from those
-    best_score = max(score for _, score in matched)
-    best_recipes = [r for r, score in matched if score == best_score]
-
-    return random.choice(best_recipes)
+    # choose one of the matched recipes at random and return it
+    chosen = random.choice(matched)
+    return chosen[0]
 
 
 @app.route("/suggestions", methods=["GET", "POST"])
 @login_required
 def suggestions():
-    suggested_recipe = None
+    user_id = current_user.id
+    random_suggested_recipe = None
     error_message = ""
+    
+    all_suggestable_recipes = get_makable_recipes(user_id)
 
     if request.method == "POST":
-        suggested_recipe = get_random_suggested_recipe(current_user.id)
+        random_suggested_recipe = get_random_suggested_recipe(user_id)
 
-        if suggested_recipe is None:
-            has_pantry = PantryItem.query.filter_by(user_id=current_user.id).first()
+        if random_suggested_recipe is None:
+            has_pantry = PantryItem.query.filter_by(user_id=user_id).first()
             if not has_pantry:
                 error_message = "add some items to your pantry first to get recipe suggestions"
             else:
@@ -556,7 +591,8 @@ def suggestions():
     return render_template(
         "suggestions.html",
         active_page="suggestions",
-        suggested_recipe=suggested_recipe,
+        random_suggested_recipe=random_suggested_recipe,
+        all_suggestable_recipes=all_suggestable_recipes,
         error_message=error_message
     )
 

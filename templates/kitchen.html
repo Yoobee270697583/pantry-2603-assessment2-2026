@@ -2,7 +2,43 @@
 
 {% block title %}My Kitchen — Pantry{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pantry.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>My Kitchen</h1>
-<p>This is the My Kitchen screen. Currently under construction. Other functionalities are working.</p>
+<p>This is the My Kitchen screen.</p>
+
+<h2>Expiring Soon</h2>
+<p>Here are your top 15 pantry items that are expiring next in order of the day they expire:</p>
+    {% if expiring_soon %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Expiry Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in expiring_soon %}
+            <tr>
+                <td>{{ item.ingredient.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit }}</td>
+                <td>{{ item.expiry_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No items are expiring soon.</p>
+    {% endif %}
+
+
+
+
+
 {% endblock %}
