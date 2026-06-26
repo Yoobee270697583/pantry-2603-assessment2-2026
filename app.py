@@ -115,10 +115,47 @@ def register():
     return render_template("register.html", form=form)
 
 
+def get_recipes_using_expiring(user_id, expiring_items):
+    # names of the items that are expiring soon
+    expiring_names = set(item.ingredient.name.lower() for item in expiring_items)
+
+    # if nothing is expiring, there's nothing to suggest using up
+    if not expiring_names:
+        return []
+
+    # names of everything currently in the pantry
+    pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
+    pantry_names = set(item.ingredient.name.lower() for item in pantry_items)
+
+    # all saved TheMealDB recipes
+    saved_recipes = Recipe.query.filter_by(user_id=user_id, source="TheMealDB").all()
+
+    # keep recipes that are fully makeable AND use at least one expiring item
+    makable_with_expiring = []
+    for recipe in saved_recipes:
+        recipe_names = set(i.name.lower() for i in recipe.ingredients)
+        if recipe_names <= pantry_names and recipe_names & expiring_names:
+            makable_with_expiring.append(recipe)
+
+    return makable_with_expiring
+
 @app.route("/kitchen")
 @login_required
 def kitchen():
-    return render_template("kitchen.html", active_page="kitchen")
+    
+    user_id = current_user.id
+    
+    expiring_soon = PantryItem.query.filter_by(owner=current_user)  .filter(
+                    PantryItem.expiry_date != None)                 .filter(
+                    PantryItem.expiry_date >= date.today())         .order_by(
+                    PantryItem.expiry_date.asc())                   .limit(15)
+                    
+    suggested_recipes = get_recipes_using_expiring(user_id, expiring_soon)
+    
+    planned_meals = get_meal_plans()
+    
+    return render_template("kitchen.html", active_page="kitchen", expiring_soon=expiring_soon, suggested_recipes=suggested_recipes, planned_meals=planned_meals)
+
 
 # Pantry functionalities
 @app.route("/pantry")
@@ -503,12 +540,36 @@ def create_recipe():
     return render_template("create_recipe.html", active_page="recipes", form=form)
 
 
+def get_makable_recipes(user_id):
+    # get all pantry ingredient names for this user
+    pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
+    pantry_item_names = set(item.ingredient.name.lower() for item in pantry_items)
+
+    if not pantry_item_names:
+        return []
+
+    # get all saved TheMealDB recipes with their stored ingredients
+    saved_recipes = Recipe.query.filter_by(user_id=user_id, source="TheMealDB").all()
+
+    if not saved_recipes:
+        return []
+
+    # check which recipes have at least one ingredient in the pantry
+    makable_recipes = []
+    for recipe in saved_recipes:
+        ingredient_names = set(i.name.lower() for i in recipe.ingredients)
+        if ingredient_names <= pantry_item_names:
+            makable_recipes.append(recipe)
+
+    return makable_recipes
+
+
 def get_random_suggested_recipe(user_id):
     # get all pantry ingredient names for this user
     pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
-    pantry_names = set(item.ingredient.name.lower() for item in pantry_items)
+    pantry_item_names = set(item.ingredient.name.lower() for item in pantry_items)
 
-    if not pantry_names:
+    if not pantry_item_names:
         return None
 
     # get all saved TheMealDB recipes with their stored ingredients
@@ -520,8 +581,8 @@ def get_random_suggested_recipe(user_id):
     # count how many of each recipe's ingredients are in the pantry
     recipe_scores = []
     for recipe in saved_recipes:
-        recipe_ingredient_names = set(i.name.lower() for i in recipe.ingredients)
-        matches = len(pantry_names & recipe_ingredient_names)
+        ingredient_names = set(i.name.lower() for i in recipe.ingredients)
+        matches = len(pantry_item_names & ingredient_names)
         recipe_scores.append((recipe, matches))
 
     # only keep recipes that match at least one pantry item
@@ -530,24 +591,25 @@ def get_random_suggested_recipe(user_id):
     if not matched:
         return None
 
-    # find the highest match count then pick randomly from those
-    best_score = max(score for _, score in matched)
-    best_recipes = [r for r, score in matched if score == best_score]
-
-    return random.choice(best_recipes)
+    # choose one of the matched recipes at random and return it
+    chosen = random.choice(matched)
+    return chosen[0]
 
 
 @app.route("/suggestions", methods=["GET", "POST"])
 @login_required
 def suggestions():
-    suggested_recipe = None
+    user_id = current_user.id
+    random_suggested_recipe = None
     error_message = ""
+    
+    all_suggestable_recipes = get_makable_recipes(user_id)
 
     if request.method == "POST":
-        suggested_recipe = get_random_suggested_recipe(current_user.id)
+        random_suggested_recipe = get_random_suggested_recipe(user_id)
 
-        if suggested_recipe is None:
-            has_pantry = PantryItem.query.filter_by(user_id=current_user.id).first()
+        if random_suggested_recipe is None:
+            has_pantry = PantryItem.query.filter_by(user_id=user_id).first()
             if not has_pantry:
                 error_message = "add some items to your pantry first to get recipe suggestions"
             else:
@@ -556,7 +618,8 @@ def suggestions():
     return render_template(
         "suggestions.html",
         active_page="suggestions",
-        suggested_recipe=suggested_recipe,
+        random_suggested_recipe=random_suggested_recipe,
+        all_suggestable_recipes=all_suggestable_recipes,
         error_message=error_message
     )
 
@@ -568,10 +631,8 @@ def suggestions_refresh():
     return redirect(url_for("suggestions"))
 
 
-@app.route("/planned")
-@login_required
-def planned():
-    # Retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
+def get_meal_plans():
+        # Retrieve all meal plans for the current user, ordered by ascending or oldest/lowest id - which means oldest added to newest added planned meals
     meal_plans = MealPlan.query.filter_by(user_id=current_user.id).order_by(MealPlan.id.asc()).all()
     
     # Get and store the recipe data including img, all metadata - because it's not in the MealPlan model
@@ -582,7 +643,15 @@ def planned():
         # Put the retrieved meal_plans and recipes together into one variable     
         planned_meals.append({"plan": meal, "recipe": recipe})
         
-    return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
+    return planned_meals
+
+@app.route("/planned")
+@login_required
+def planned():
+ 
+    all_planned_meals = get_meal_plans()
+        
+    return render_template("planned.html", active_page="planned", planned_meals=all_planned_meals)
     
     
 @app.route("/planned/add_saved_to_plan/<int:recipe_id>", methods=['POST'])

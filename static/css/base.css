@@ -354,6 +354,26 @@ table tbody tr:hover td {
     color: #aab4ad;
 }
 
+.dashboard-section {
+    width: fit-content;
+    border: 1px solid #e3e6e3;
+    border-radius: 10px;
+    background: #fff;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.dashboard-section .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: fit-content;
+}
+
+.dashboard-section .grid .recipe-plan-wrapper {
+    width: 280px;
+}
+
 /* ---- tab bar ---- */
 
 .tab-bar {
