@@ -3,7 +3,7 @@ from flask import Blueprint, request, render_template, redirect, flash, url_for
 from flask_login import current_user, login_required
 from models import MealPlan, Recipe, CookedMeal, db
 from api_helper import get_or_create_recipe
-from pantry_helper import sync_shopping_list, subtract_recipe_ingredients_from_pantry, get_missing_ingredients
+from pantry_helper import sync_shopping_list, subtract_recipe_ingredients_from_pantry
 
 # meals a user has scheduled to cook, and marking them as cooked
 
@@ -111,12 +111,6 @@ def mark_as_cooked(item_id):
     recipe = Recipe.query.get(planned_meal.recipe_id)
     if recipe is None:
         flash('Could not find that recipe. Please try again', 'error')
-        return redirect(url_for('planned.planned'))
-
-    # block cooking if the pantry can't actually cover this recipe
-    missing = get_missing_ingredients(current_user.id, recipe)
-    if missing:
-        flash(f"You're missing some ingredients for this recipe: {', '.join(missing)}", 'error')
         return redirect(url_for('planned.planned'))
 
     cooked_meal = CookedMeal(

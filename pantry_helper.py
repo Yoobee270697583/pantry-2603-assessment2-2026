@@ -205,38 +205,6 @@ def add_quantity_to_pantry(user_id, ingredient_id, quantity, unit, default_categ
     return pantry_item
 
 
-def get_missing_ingredients(user_id, recipe):
-    """Returns the names of any recipe ingredients the user doesn't have enough of in their pantry.
-
-    Uses the same matching/unit rules as subtract_recipe_ingredients_from_pantry,
-    so this only flags ingredients that function can actually account for - an
-    ingredient name we can't match to anything counts as missing too, since
-    there's no pantry stock to check it against either way.
-    """
-    missing = []
-
-    for recipe_ingredient in recipe.ingredients:
-        ingredient = find_matching_ingredient(recipe_ingredient.name)
-        if ingredient is None:
-            missing.append(recipe_ingredient.name)
-            continue
-
-        needed_base_qty, needed_base_unit = sanitize_amount(recipe_ingredient.amount)
-
-        pantry_item = PantryItem.query.filter_by(
-            user_id=user_id, ingredient_id=ingredient.id
-        ).first()
-        if pantry_item is None:
-            missing.append(recipe_ingredient.name)
-            continue
-
-        pantry_base_qty, pantry_base_unit = to_base(pantry_item.quantity, pantry_item.unit)
-        if pantry_base_unit != needed_base_unit or pantry_base_qty < needed_base_qty:
-            missing.append(recipe_ingredient.name)
-
-    return missing
-
-
 def subtract_recipe_ingredients_from_pantry(user_id, recipe):
     """Takes a recipe's ingredients off the user's pantry stock when cooked.
 
