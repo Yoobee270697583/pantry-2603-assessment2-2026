@@ -1,18 +1,5 @@
-/* shared with recipes.css - duplicated here since shopping.html doesn't load that stylesheet */
-.search-error {
-    color: #c0392b;
-    background: #fdf0ef;
-    border: 1px solid #f5c6c2;
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin-bottom: 16px;
-    font-size: 0.9rem;
-}
-
-.empty-state {
-    color: #6b7a6e;
-    margin-top: 8px;
-}
+/* .search-error and .empty-state now live in base.css - shared across
+   pretty much every page, no need to duplicate them here anymore */
 
 .tag {
     background: #eaf4ee;
@@ -49,16 +36,6 @@
     min-width: 3.5rem;
     text-align: center;
     font-weight: 600;
-}
-
-/* ---- orders ---- */
-
-.order-card {
-    margin-bottom: 20px;
-}
-
-.order-card table {
-    margin-top: 12px;
 }
 
 /* ---- manual add panel ---- */

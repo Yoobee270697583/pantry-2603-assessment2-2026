@@ -1,3 +1,6 @@
+# dropdown options shared by pantry/shopping forms + templates, so the
+# wording stays the same everywhere
+
 PANTRY_CATEGORY_CHOICES = [
     ("", "Select a category"),
     ("fruit_veg", "Fruit & Vegetables"),
@@ -12,6 +15,8 @@ PANTRY_CATEGORY_CHOICES = [
     ("other", "Other"),
 ]
 
+# quick lookup so we can turn a stored value like "fruit_veg" back into
+# its display label without looping through the choices list
 CATEGORY_LABELS = dict(PANTRY_CATEGORY_CHOICES)
 
 PANTRY_UNIT_CHOICES = [
@@ -28,4 +33,5 @@ PANTRY_UNIT_CHOICES = [
     ("other", "Other"),
 ]
 
+# same idea as CATEGORY_LABELS but for units
 UNIT_LABELS = dict(PANTRY_UNIT_CHOICES)

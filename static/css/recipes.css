@@ -1,4 +1,7 @@
 /* ---- search ---- */
+/* .search-input, .btn-search, .search-error, .empty-state, .back-link,
+   .filter-bar/.filter-select/.filter-clear all live in base.css now -
+   they're shared across most pages, not just recipes */
 
 .search-form {
     display: flex;
@@ -6,48 +9,7 @@
     margin: 24px 0;
 }
 
-.search-input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid #c8d0ca;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    color: #1f2421;
-    outline: none;
-}
-
-.search-input:focus {
-    border-color: #2f7d57;
-    box-shadow: 0 0 0 3px rgba(47, 125, 87, 0.15);
-}
-
-.btn-search {
-    padding: 10px 20px;
-    background: #2f7d57;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-search:hover {
-    background: #256647;
-}
-
-.search-error {
-    color: #c0392b;
-    background: #fdf0ef;
-    border: 1px solid #f5c6c2;
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin-bottom: 16px;
-    font-size: 0.9rem;
-}
-
-.search-prompt,
-.empty-state {
+.search-prompt {
     color: #6b7a6e;
     margin-top: 8px;
 }
@@ -59,18 +21,6 @@
 }
 
 /* ---- recipe detail ---- */
-
-.back-link {
-    display: inline-block;
-    margin-bottom: 24px;
-    color: #2f7d57;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
 
 .recipe-header {
     display: flex;
@@ -237,10 +187,12 @@
     padding: 8px 16px;
     background: #2f7d57;
     color: #fff;
+    border: none;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .btn-create:hover {
@@ -264,42 +216,6 @@
 .btn-random:hover {
     background: #eaf4ee;
 }
-
-/* ---- filter bar ---- */
-
-.filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.filter-select {
-    padding: 8px 12px;
-    border: 1px solid #c8d0ca;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: #1f2421;
-    background: #fff;
-    cursor: pointer;
-    outline: none;
-}
-
-.filter-select:focus {
-    border-color: #2f7d57;
-}
-
-.filter-clear {
-    font-size: 0.85rem;
-    color: #6b7a6e;
-    text-decoration: underline;
-}
-
-.filter-clear:hover {
-    color: #1f2421;
-}
-
 
 /* ---- create / edit recipe form ---- */
 
@@ -385,8 +301,12 @@
     width: 100%;
 }
 
+/* re-declared here (also in base.css) on purpose: this has to load after
+   .btn-submit so it can override its background/color on the combined
+   "btn-submit btn-danger" delete buttons - moving it into base.css would
+   make .btn-submit win instead, since base.css loads first */
 .btn-danger {
-    background: var(--surface) ;
+    background: var(--surface);
     color: var(--danger);
     border-color: var(--danger);
 }
@@ -396,7 +316,7 @@
 }
 
 .btn-danger:hover {
-    background: var(--danger) ;
+    background: var(--danger);
     color: #fff;
 }
 

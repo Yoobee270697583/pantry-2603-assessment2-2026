@@ -10,31 +10,17 @@
 <h1>Previous Orders</h1>
 
 {% if orders %}
-    {% for order in orders %}
-    <div class="card order-card">
-        <div class="card-body">
-            <h3 class="card-title">Order #{{ order.id }} — {{ order.ordered_at.strftime('%d %b %Y, %H:%M') }}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ingredient</th>
-                        <th>Quantity</th>
-                        <th>Unit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in order.items %}
-                    <tr>
-                        <td>{{ item.ingredient.name }}</td>
-                        <td>{{ "%.2f"|format(item.quantity) }}</td>
-                        <td>{{ unit_labels.get(item.unit, item.unit) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="grid">
+        {% for order in orders %}
+        <a href="{{ url_for('orders.order_detail', order_id=order.id) }}" class="card">
+            <div class="card-body">
+                <h3 class="card-title">Order #{{ order.id }}</h3>
+                <p class="card-meta">{{ order.ordered_at.strftime('%d %b %Y, %H:%M') }}</p>
+                <p class="card-meta">{{ order.items|length }} item{{ 's' if order.items|length != 1 else '' }}</p>
+            </div>
+        </a>
+        {% endfor %}
     </div>
-    {% endfor %}
 {% else %}
     <p class="empty-state">No orders yet — use "Add List To Pantry" on the Shopping List screen to create one.</p>
 {% endif %}

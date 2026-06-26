@@ -8,11 +8,11 @@
 
 {% block content %}
 
-<a href="{{ url_for('recipes', tab='created') }}" class="back-link">← back to my recipes</a>
+<a href="{{ url_for('recipes.recipes', tab='created') }}" class="back-link">← back to my recipes</a>
 
 <h1>Create a Recipe</h1>
 
-<form action="{{ url_for('create_recipe') }}" method="POST" class="recipe-form">
+<form action="{{ url_for('recipes.create_recipe') }}" method="POST" class="recipe-form">
     {{ form.hidden_tag() }}
 
     <div class="form-field">

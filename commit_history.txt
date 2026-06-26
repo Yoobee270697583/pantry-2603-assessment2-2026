@@ -1,0 +1,152 @@
+c3a8f0b 2026-06-26 Ben Edwards [refs/heads/chore/main-clean-up]: major css cleanup
+44f5ed9 2026-06-26 Ben Edwards [refs/heads/chore/main-clean-up]: added consistent comments throughout the app. Also removed a dead duplicate CustomRecipeForm
+dfb75ef 2026-06-26 Ben Edwards [refs/heads/chore/main-clean-up]: separating concerns, adding separate route pages. Blueprint allows us to define routes without adding the app
+96bff90 2026-06-25 Ben Edwards [refs/heads/main]: adding blurb to my kitchen
+ff27cdf 2026-06-24 Ben Edwards [refs/heads/main]: updated readme and css file handled non unit words
+7f57edf 2026-06-24 Ben Edwards [refs/heads/main]: fix: typo in app.py sugested_recipes vs suggested_recipe
+1bee443 2026-06-24 Ben Edwards [refs/heads/main]: Feature/add myrecipe ingredient list integration (#24)
+21dcf77 2026-06-24 Adam Calkin [refs/remotes/origin/feature/add-myrecipe-ingredient-list-integration]: Merge branch 'main' into feature/add-myrecipe-ingredient-list-integration
+c09263e 2026-06-24 Adam Calkin [refs/remotes/origin/feature/add-myrecipe-ingredient-list-integration]: Added change to switch suggested recipes to pantry-based matching
+9cf6a03 2026-06-24 Ben Edwards [refs/heads/main]: Feature/subtract from pantry (#23)
+181e041 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: Added styles for the quantity stepper, manual-add panel, and order cards; duplicated a few small shared selectors (.tag, .empty-state, .search-error) from recipes.css since this page doesn't load that stylesheet
+beeed14 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: Removed the now-implemented commented-out feature spec block (shopping list integration + pantry subtraction on cook), since that behavior is now real.
+8e16abe 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: Replaced the spec-comment stub with a working Order History page listing each past order and its ingredient/quantity snapshot.
+026bffd 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: Replaced the spec-comment stub with a working Shopping List page: item table with quantity stepper, add-to-pantry/delete actions, "Add List To Pantry" checkout button, and an ingredient-search manual-add panel. Fixed a duplicate hidden-field bug where add_form.hidden_tag() auto-rendered an empty ingredient_id field that collided with the real one, causing manual adds to always fail validation — swapped to add_form.csrf_token.
+1973ccc 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: wired sync shopping list into every route that changes planned meals or pantry stock add_searched_to_plan, add_cooked_to_plan, delete_planned_meal, mark_as_cooked
+a91344c 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: Added helpers to parse free-text recipe amounts into quantity + unit Addded ingredient name matching, shopping list sync, pantry stock lookup and the cook time pantry subtraction logic
+a365dcb 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: Added AddShoppingItemForm and ShoppingitemActionForm
+d565a84 2026-06-24 Ben Edwards [refs/heads/feature/subtract-from-pantry]: added ShoppingListItem, Order, OrderItem models to support an editable shopping list
+4a6cb9e 2026-06-23 Ben Edwards [refs/heads/main]: Feature/persist search filter api results (#22)
+ab54792 2026-06-23 Ben Edwards [refs/heads/feature/persist-search-filter-api-results]: Merge branch 'main' into feature/persist-search-filter-api-results
+be015a9 2026-06-23 Ben Edwards [refs/heads/main]: Feature/flash messages (#21)
+86387a6 2026-06-23 Adam Calkin [refs/remotes/origin/feature/add-myrecipe-ingredient-list-integration]: Fix save recipe bug, add env setup, fix suggestions back link and count
+01cf2d3 2026-06-23 Allan Werner [refs/heads/feature/persist-search-filter-api-results]: Category/Area filter results now also persist after planning a meal. Empties dropped to None
+14d061b 2026-06-23 Allan Werner [refs/heads/feature/persist-search-filter-api-results]: Search results persist after clicking Plan This Meal. Buttons now keep a user where they are, with flash messages working nicely and coloured properly
+f9698d2 2026-06-23 Adam Calkin [refs/remotes/origin/feature/add-myrecipe-ingredient-list-integration]: Add suggested recipes page with get and refresh buttons, & Added remove recipe button
+dd54bec 2026-06-23 Allan Werner [refs/heads/feature/flash-messages]: Modify and render flash messages, register route bug fix
+136b76f 2026-06-22 Allan Werner [refs/remotes/origin/feature/cooked-meals]: Create basic Cooked Meals functionality, allocate planned meals as cooked, re-cook previously cooked meals, delete cooked instances
+d5d9d87 2026-06-22 Ben Edwards [refs/heads/main]: fixing the recipes wrapper (#20)
+334b7d6 2026-06-22 Ben Edwards [refs/heads/chore/fixing-saved-rec-grid]: fixing the recipes wrapper
+9825fef 2026-06-22 Ben Edwards [refs/heads/main]: Feature/adding ing to pantry (#19)
+1a50852 2026-06-22 Ben Edwards [refs/heads/feature/adding-ing-to-pantry]: Merge branch 'main' into feature/adding-ing-to-pantry
+9756a15 2026-06-22 Ben Edwards [refs/heads/main]: Chore/cleaning up css (#18)
+c7dee2a 2026-06-22 Ben Edwards [refs/heads/chore/cleaning-up-css]: style fixes
+23a0907 2026-06-22 Ben Edwards [refs/heads/chore/cleaning-up-css]: Merge branch 'main' into chore/cleaning-up-css
+90fd921 2026-06-22 Ben Edwards [refs/heads/main]: Feature/planned meals (#17)
+b4b0807 2026-06-20 Allan Werner [refs/remotes/origin/feature/planned-meals]: One small style change on My Created Recipes
+11029b3 2026-06-20 Allan Werner [refs/remotes/origin/feature/planned-meals]: Extract helper function from save_recipe, plan meal from API saves recipe, then adds instance to planned meals
+efb8034 2026-06-20 Ben Edwards [refs/heads/feature/adding-ing-to-pantry]: added add to pantry button to ingredient cards. Locked ingredient name instead of free text field
+088bde9 2026-06-20 Ben Edwards [refs/heads/feature/adding-ing-to-pantry]: AddPantryItemForm.name field replaced with an ingredient id that is validated server side against the ingredient table. Removed a dead duplicate AddPantryItemForm
+39a05af 2026-06-20 Ben Edwards [refs/heads/feature/adding-ing-to-pantry]: syncs 927 ingredients from the databaseon first startup if empty. Ingredients tab now searches the local table
+e7022d5 2026-06-20 Ben Edwards [refs/heads/feature/adding-ing-to-pantry]: replaced search ingredients with fetch_ingredients_list
+6a4526d 2026-06-20 Ben Edwards [refs/heads/feature/adding-ing-to-pantry]: added ingredient table removed ingredient name from pantry item so that it just references the ingredient ids name from the ingredient table
+7205fcc 2026-06-19 Allan Werner [refs/remotes/origin/feature/planned-meals]: WIP: planned meals display, add-from-saved, remove
+9fd0d2b 2026-06-19 Allan Werner [refs/remotes/origin/feature/planned-meals]: Add Planned Meals display, add-from-saved, and remove-from-plan
+d683ba2 2026-06-18 Ben Edwards [refs/heads/chore/cleaning-up-css]: making table shared, removing .pantry-table
+65813e5 2026-06-18 Ben Edwards [refs/heads/chore/cleaning-up-css]: removing unused 'recipes-toolbar' as it is in base
+09d224c 2026-06-18 Ben Edwards [refs/heads/chore/cleaning-up-css]: adding media queries to base
+ee1bb30 2026-06-18 Ben Edwards [refs/heads/chore/cleaning-up-css]: removing '.pantry-toolbar': unused
+bbb8ecd 2026-06-18 Ben Edwards [refs/heads/chore/cleaning-up-css]: removed all 'recipe-' classes and changed the name to be more general. Also moved into base.css
+c11d05a 2026-06-18 Ben Edwards [refs/heads/feature/ingredients-tab]: adding tab system and styles to pantry
+b657086 2026-06-18 Ben Edwards [refs/heads/feature/ingredients-tab]: implementing a tab system on the pantry route
+d2aba02 2026-06-18 Ben Edwards [refs/heads/feature/ingredients-tab]: Implementing a search ingredient api helper function
+cb950df 2026-06-17 Ben Edwards [refs/heads/main]: fixing duplicate import (#16)
+6728b38 2026-06-17 Ben Edwards [refs/heads/fix/removing-duplicate-import]: fixing duplicate import
+ad3963a 2026-06-17 Ben Edwards [refs/heads/main]: Feature/pantry item categories (#15)
+e20818d 2026-06-17 Ben Edwards [refs/heads/feature/pantry-item-categories]: fixing duplicates
+0ce1580 2026-06-17 Ben Edwards [refs/heads/feature/pantry-item-categories]: Merge branch 'main' into feature/pantry-item-categories
+0329e45 2026-06-17 Ben Edwards [refs/heads/main]: Feature/pantry update del (#14)
+6b02db4 2026-06-17 Ben Edwards [refs/heads/feature/pantry-update-del]: Merge branch 'main' into feature/pantry-update-del
+6b5385f 2026-06-17 Ben Edwards [refs/heads/feature/pantry-item-categories]: category toolbar implementation
+bc5d70f 2026-06-17 Adam Calkin [refs/heads/main]: Feature/my recipes page (#13)
+bf11b76 2026-06-17 Adam Calkin [refs/remotes/origin/feature/my-recipes-page]: Fix duplicate
+77f0287 2026-06-17 Adam Calkin [refs/remotes/origin/feature/my-recipes-page]: Merge branch 'main' into feature/my-recipes-page
+f877976 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: adding get method into pantry item class. For getting the label for unit values
+063acd4 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: changing unit from type input to type select on the Flask Form
+5c20a95 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: Adding constants for units
+38678a0 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: Adding select to base form styles for consistency
+1b5ce4b 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: Importing pantry category choices and populating select fields with them
+f968533 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: importing CATEGORY_LABELS and  adding them to the models for display on the frontend table adding get method property to pantry item for labels
+3c59982 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: adding a constants file to hold global Pantry Category Choices as well as a dict lookup
+4516285 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: adding category to new_pantry_item create in app
+3321c7e 2026-06-16 Ben Edwards [refs/heads/feature/pantry-item-categories]: adding constants.py for category choices adding categories to PantryItem model adding select field to form
+888d26c 2026-06-16 Ben Edwards [refs/heads/feature/pantry-update-del]: adding edit pantry item functionality
+b26a148 2026-06-16 Ben Edwards [refs/heads/feature/pantry-update-del]: styling delete buttons
+b7033fa 2026-06-16 Ben Edwards [refs/heads/feature/pantry-update-del]: adding font awesome icons to base template
+6697ba1 2026-06-16 Ben Edwards [refs/heads/feature/pantry-update-del]: adding deleteform import and functionality
+e1895a9 2026-06-16 Ben Edwards [refs/heads/feature/pantry-update-del]: adding pantry stylesheet to template adding actions in the pantry table to delete
+bb32538 2026-06-16 Ben Edwards [refs/heads/feature/pantry-update-del]: adding delete route
+d96d1b8 2026-06-15 Adam Calkin [refs/heads/feature/my-recipes-page]: Add a few recipe page changes: edit, image URL, 3 tabs, filters, sort, random in header
+1b68808 2026-06-15 Ben Edwards [refs/heads/main]: Feature/add pantry item (#12)
+4c86087 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: Merge branch 'main' into feature/add-pantry-item
+43e2cba 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: removing flash messages from pantry for the moment
+cd9e895 2026-06-15 Ben Edwards [refs/heads/main]: Feature/add pantry item (#11)
+1995884 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: Merge branch 'main' into feature/add-pantry-item
+6d5fbf3 2026-06-15 Adam Calkin [refs/heads/main]: Add My Recipes page with 4 tabs, save recipe, create recipe, random and filters (#10)
+1d8adc2 2026-06-15 Adam Calkin [refs/heads/feature/my-recipes-page]: Merge main CSS restructure into feature/my-recipes-page
+d4b8106 2026-06-15 Adam Calkin [refs/heads/feature/my-recipes-page]: Add My Recipes page with 4 tabs, save recipe, create recipe, random and filters
+5fc2980 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: wrapping header and adding back button
+ab0d1fd 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: Removing line breaks for more consistent styling
+f27590f 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: Adding pantry css with overides for the base form
+286be81 2026-06-15 Ben Edwards [refs/heads/feature/add-pantry-item]: adding base table styles, aswell as extracting form styles from login into base so that we can just use overrides
+dae3ee1 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding table column for expiry date
+47cbb90 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding date to add pantry item form
+0958199 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding date field to pantry item form
+a29c871 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: passing pantry items through the pantry route for display on UI
+f7cd1a9 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding button to add pantry item form from pantry
+26b8a4b 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: rendering the form on the template
+670928d 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding new pantry item route to the app
+c0bae10 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding new pantry item form
+cc4d634 2026-06-14 Ben Edwards [refs/heads/feature/add-pantry-item]: adding routes and form to db logic
+04fdf27 2026-06-13 Ben Edwards [refs/heads/main]: Feature/css cleanup (#9)
+adf370f 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: adjusting recipe extra pages to inherit the recipe css
+5f8dff9 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: fixing left nav links
+59c5d65 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: adding documentation for CSS structure
+8983f0c 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: adjusting old styles to work with new css structure
+a2771fd 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: extracting nav component into app-shell.css
+9545f31 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: adding an auth_base template that is inherited by login and register since they share the same css file
+fa2ce9a 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: Removing old style structure
+a98f960 2026-06-13 Ben Edwards [refs/remotes/origin/feature/css-cleanup]: Adding new CSS file structure
+cf51b35 2026-06-12 Ben Edwards [refs/heads/feature/pantry-crud]: Merge remote-tracking branch 'origin/main' into feature/pantry-crud
+9b018d0 2026-06-12 Ben Edwards [refs/heads/feature/pantry-crud]: adding pantry list and form with styles
+a8b0c82 2026-06-12 Ben Edwards [refs/heads/feature/my-recipes-page]: Feature/auth error handling (#8)
+a1f062d 2026-06-10 Allan Werner [refs/remotes/origin/feature/auth-error-handling]: Add regex password enforcement
+40c5360 2026-06-09 Allan Werner [refs/remotes/origin/feature/auth-error-handling]: Add form field error message outputs
+c027e11 2026-06-09 Allan Werner [refs/remotes/origin/feature/route-feature-descriptions]: Add feature descriptions to placeholder templates and update CSS comments
+28fba39 2026-06-09 Ben Edwards [refs/heads/feature/pantry-crud]: Added: Optional to form basic template form basic pantry items list
+abbcb59 2026-06-09 Ben Edwards [refs/heads/feature/pantry-crud]: Added pantry/add route with object commit to db
+cfbfb20 2026-06-09 Ben Edwards [refs/heads/feature/pantry-crud]: Add current pantry items to pantry route
+5f3fa9e 2026-06-09 Ben Edwards [refs/heads/feature/pantry-crud]: Add item to pantry form
+d93c948 2026-06-09 Ben Edwards [refs/heads/feature/my-recipes-page]: fix: adding user model import (#7)
+7c382b5 2026-06-09 Ben Edwards [refs/heads/fix/add-usermodel-to-forms]: fix: adding user model import
+dc6a300 2026-06-09 Allan Werner [refs/heads/feature/my-recipes-page]: Feature/login (#6)
+adf3277 2026-06-09 Allan [refs/remotes/origin/feature/login]: Merge branch 'main' into feature/login
+b5dfefa 2026-06-09 Adam Calkin [refs/heads/feature/my-recipes-page]: Add recipe API integration (#5)
+c2a74e7 2026-06-09 Adam Calkin [refs/remotes/origin/feature/recipe-api]: Merge branch 'main' into feature/recipe-api
+4c95871 2026-06-09 Ben Edwards [refs/heads/feature/my-recipes-page]: Feature/meal plan models (#4)
+8ff3985 2026-06-09 Ben Edwards [refs/remotes/origin/feature/meal-plan-models]: Merge branch 'main' into feature/meal-plan-models
+ae87753 2026-06-09 Ben Edwards [refs/heads/feature/my-recipes-page]: Feature/adding remaining models (#3)
+517387c 2026-06-08 Allan Werner [refs/remotes/origin/feature/login]: Wire up registration, login, logout, route protection and account menu
+0e9d899 2026-06-08 Ben Edwards [refs/heads/feature/meal-plan-models]: Added DB Debug prints to app.py
+2b6e1af 2026-06-08 Ben Edwards [refs/heads/feature/meal-plan-models]: Adding MealPlan & CookedMeal Models
+03fb057 2026-06-08 Ben Edwards [refs/heads/feature/adding-remaining-models]: Adding Recipe created_at property
+c66df0c 2026-06-08 Ben Edwards [refs/heads/feature/adding-remaining-models]: Adding RecipeIngredient Model
+79c9052 2026-06-08 Ben Edwards [refs/heads/feature/adding-remaining-models]: Adding PantryItem and Recipe relationships inside user model
+d272f11 2026-06-08 Ben Edwards [refs/heads/feature/adding-remaining-models]: Adding Recipe Model
+96dcc5a 2026-06-08 Ben Edwards [refs/heads/feature/adding-remaining-models]: Updating password hash to 255 chars
+38dd74f 2026-06-06 Allan Werner [refs/remotes/origin/feature/login]: Add User model, user loader, and auth forms
+2af6c97 2026-06-06 Allan Werner [refs/remotes/origin/feature/login]: Remove stray zip archive from images folder
+b6c35a7 2026-06-06 Allan Werner [refs/remotes/origin/feature/login]: Added completed login template, empty register template, restructured route home page
+82c2343 2026-06-05 Adam Calkin [refs/remotes/origin/feature/recipe-api]: Add recipe API integration
+12be6c3 2026-06-05 Ben Edwards [refs/heads/feature/my-recipes-page]: Feature/configure db (#2)
+13f2132 2026-06-05 Ben Edwards [refs/heads/feature/configure-db]: Added database instance folder to .gitignore
+9162a38 2026-06-05 Ben Edwards [refs/heads/feature/configure-db]: Create User and PantryItem models
+453287d 2026-06-05 Ben Edwards [refs/heads/feature/configure-db]: Add database config plus commented sections
+1289647 2026-06-05 Ben Edwards [refs/remotes/origin/feature/login]: Adding Pull Request process to CONTRIBUTING.md
+636ec61 2026-06-05 Ben Edwards [refs/remotes/origin/feature/login]: Adding pull request template
+bb3fe0e 2026-06-05 Ben Edwards [refs/remotes/origin/feature/login]: Add base project requirements (#1)
+ae8248f 2026-06-05 Ben Edwards [refs/heads/feature/updating-requirements]: Add base project requirements
+b217967 2026-06-05 Ben Edwards [refs/remotes/origin/feature/login]: Adding README for setup instructions involving venv
+f3d6d74 2026-06-05 Ben Edwards [refs/remotes/origin/feature/login]: Add branching and contribution guidelines
+4e4f359 2026-06-05 Ben Edwards [refs/remotes/origin/feature/login]: Update gitignore for .venv folder
+7de6060 2026-06-03 Allan [refs/remotes/origin/dev]: Initial commit: project structure, base template, desktop and mobile navigation

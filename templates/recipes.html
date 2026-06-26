@@ -11,16 +11,16 @@
 <div class="page-header">
     <h1>My Recipes</h1>
     <div class="page-header-actions">
-        <a href="{{ url_for('recipe_random') }}" class="btn-random">Random Recipe</a>
-        <a href="{{ url_for('create_recipe') }}" class="btn-create">+ New Recipe</a>
+        <a href="{{ url_for('recipes.recipe_random') }}" class="btn-random">Random Recipe</a>
+        <a href="{{ url_for('recipes.create_recipe') }}" class="btn-create">+ New Recipe</a>
     </div>
 </div>
 
 <!-- 3 tabs -->
 <div class="tab-bar">
-    <a href="{{ url_for('recipes', tab='saved') }}"   class="tab {% if active_tab == 'saved' %}is-active{% endif %}">Saved Recipes</a>
-    <a href="{{ url_for('recipes', tab='search') }}"  class="tab {% if active_tab == 'search' %}is-active{% endif %}">Pantry Recipe Library</a>
-    <a href="{{ url_for('recipes', tab='created') }}" class="tab {% if active_tab == 'created' %}is-active{% endif %}">My Created Recipes</a>
+    <a href="{{ url_for('recipes.recipes', tab='saved') }}"   class="tab {% if active_tab == 'saved' %}is-active{% endif %}">Saved Recipes</a>
+    <a href="{{ url_for('recipes.recipes', tab='search') }}"  class="tab {% if active_tab == 'search' %}is-active{% endif %}">Pantry Recipe Library</a>
+    <a href="{{ url_for('recipes.recipes', tab='created') }}" class="tab {% if active_tab == 'created' %}is-active{% endif %}">My Created Recipes</a>
 </div>
 
 
@@ -33,7 +33,7 @@
 
         <!-- filter by category (up to 5 from saved recipes) -->
         {% if saved_categories %}
-        <form action="{{ url_for('recipes') }}" method="GET">
+        <form action="{{ url_for('recipes.recipes') }}" method="GET">
             <input type="hidden" name="tab" value="saved">
             <input type="hidden" name="sort" value="{{ saved_sort }}">
             <select name="filter_category" class="filter-select" onchange="this.form.submit()">
@@ -46,7 +46,7 @@
         {% endif %}
 
         <!-- sort order -->
-        <form action="{{ url_for('recipes') }}" method="GET">
+        <form action="{{ url_for('recipes.recipes') }}" method="GET">
             <input type="hidden" name="tab" value="saved">
             <input type="hidden" name="filter_category" value="{{ saved_filter_category }}">
             <select name="sort" class="filter-select" onchange="this.form.submit()">
@@ -58,7 +58,7 @@
         </form>
 
         {% if saved_filter_category %}
-            <a href="{{ url_for('recipes', tab='saved') }}" class="filter-clear">Clear filter</a>
+            <a href="{{ url_for('recipes.recipes', tab='saved') }}" class="filter-clear">Clear filter</a>
         {% endif %}
 
     </div>
@@ -68,7 +68,7 @@
         <div class="grid">
             {% for recipe in saved_recipes %}
             <div class="recipe-plan-wrapper">
-                <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
+                <a href="{{ url_for('recipes.saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
                     {% if recipe.image_url %}
                     <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
                 {% else %}
@@ -82,7 +82,7 @@
                     <p class="card-source">{{ recipe.source }}</p>
                 </div>
                 </a>
-                <form action="{{ url_for('add_saved_to_plan', recipe_id=recipe.id) }}" method="POST">
+                <form action="{{ url_for('planned.add_saved_to_plan', recipe_id=recipe.id) }}" method="POST">
                     <button type="submit" class="btn-submit">Plan this meal</button>
                 </form>
             </div>
@@ -99,7 +99,7 @@
 {% elif active_tab == 'search' %}
 
     <div class="toolbar">
-        <form action="{{ url_for('recipes') }}" method="GET" class="search-form">
+        <form action="{{ url_for('recipes.recipes') }}" method="GET" class="search-form">
             <input type="hidden" name="tab" value="search">
             <input
                 type="text"
@@ -111,12 +111,12 @@
             <button type="submit" class="btn-search">Search</button>
         </form>
 
-        <a href="{{ url_for('recipe_random') }}" class="btn-random">Random Recipe</a>
+        <a href="{{ url_for('recipes.recipe_random') }}" class="btn-random">Random Recipe</a>
     </div>
 
     <!-- 5 hardcoded category and cuisine filters -->
     <div class="filter-bar">
-        <form action="{{ url_for('recipes') }}" method="GET">
+        <form action="{{ url_for('recipes.recipes') }}" method="GET">
             <input type="hidden" name="tab" value="search">
             <select name="category" class="filter-select" onchange="this.form.submit()">
                 <option value="">Category</option>
@@ -128,7 +128,7 @@
             </select>
         </form>
 
-        <form action="{{ url_for('recipes') }}" method="GET">
+        <form action="{{ url_for('recipes.recipes') }}" method="GET">
             <input type="hidden" name="tab" value="search">
             <select name="area" class="filter-select" onchange="this.form.submit()">
                 <option value="">Cuisine</option>
@@ -141,7 +141,7 @@
         </form>
 
         {% if selected_category or selected_area %}
-            <a href="{{ url_for('recipes', tab='search') }}" class="filter-clear">Clear</a>
+            <a href="{{ url_for('recipes.recipes', tab='search') }}" class="filter-clear">Clear</a>
         {% endif %}
     </div>
 
@@ -160,7 +160,7 @@
         <div class="grid">
             {% for meal in api_results %}
             <div class="recipe-plan-wrapper">
-            <a href="{{ url_for('recipe_detail', meal_id=meal.idMeal) }}" class="card">
+            <a href="{{ url_for('recipes.recipe_detail', meal_id=meal.idMeal) }}" class="card">
                 <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="card-img">
                 <div class="card-body">
                     <h3 class="card-title">{{ meal.strMeal }}</h3>
@@ -169,7 +169,7 @@
                     {% endif %}
                 </div>
             </a>
-            <form action="{{ url_for('add_searched_to_plan', meal_id=meal.idMeal) }}" method="POST">
+            <form action="{{ url_for('planned.add_searched_to_plan', meal_id=meal.idMeal) }}" method="POST">
                 <input type="hidden" name="q" value="{{ search_query }}">
                 <input type="hidden" name="category" value="{{ selected_category }}">
                 <input type="hidden" name="area" value="{{ selected_area }}">
@@ -192,7 +192,7 @@
     {% if created_recipes %}
         <div class="grid">
             {% for recipe in created_recipes %}
-            <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
+            <a href="{{ url_for('recipes.saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
                 {% if recipe.image_url %}
                     <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
                 {% else %}
