@@ -1,3 +1,4 @@
+from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, FloatField, DateField, SelectField, HiddenField
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo, Optional, Regexp
@@ -57,7 +58,14 @@ class AddPantryItemForm(FlaskForm):
         choices=PANTRY_UNIT_CHOICES,
         validators=[InputRequired()]
     )
-    expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[Optional()])
+    # min stops the date picker itself from offering past dates - validate_expiry_date
+    # below is the real check, since the min attribute can still be bypassed
+    expiry_date = DateField(
+        'Expiry Date',
+        format='%Y-%m-%d',
+        validators=[Optional()],
+        render_kw={'min': date.today().isoformat()}
+    )
     submit = SubmitField('Add Item')
 
     def validate_ingredient_id(self, ingredient_id):
@@ -67,6 +75,10 @@ class AddPantryItemForm(FlaskForm):
             ingredient = None
         if ingredient is None:
             raise ValidationError('Choose an ingredient from the list.')
+
+    def validate_expiry_date(self, expiry_date):
+        if expiry_date.data and expiry_date.data < date.today():
+            raise ValidationError("Expiry date can't be in the past.")
 
 class DeletePantryItemForm(FlaskForm):
     pass
