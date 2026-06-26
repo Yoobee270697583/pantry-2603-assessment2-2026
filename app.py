@@ -115,19 +115,44 @@ def register():
     return render_template("register.html", form=form)
 
 
+def get_recipes_using_expiring(user_id, expiring_items):
+    # names of the items that are expiring soon
+    expiring_names = set(item.ingredient.name.lower() for item in expiring_items)
+
+    # if nothing is expiring, there's nothing to suggest using up
+    if not expiring_names:
+        return []
+
+    # names of everything currently in the pantry
+    pantry_items = PantryItem.query.filter_by(user_id=user_id).all()
+    pantry_names = set(item.ingredient.name.lower() for item in pantry_items)
+
+    # all saved TheMealDB recipes
+    saved_recipes = Recipe.query.filter_by(user_id=user_id, source="TheMealDB").all()
+
+    # keep recipes that are fully makeable AND use at least one expiring item
+    makable_with_expiring = []
+    for recipe in saved_recipes:
+        recipe_names = set(i.name.lower() for i in recipe.ingredients)
+        if recipe_names <= pantry_names and recipe_names & expiring_names:
+            makable_with_expiring.append(recipe)
+
+    return makable_with_expiring
+
 @app.route("/kitchen")
 @login_required
 def kitchen():
+    
+    user_id = current_user.id
     
     expiring_soon = PantryItem.query.filter_by(owner=current_user)  .filter(
                     PantryItem.expiry_date != None)                 .filter(
                     PantryItem.expiry_date >= date.today())         .order_by(
                     PantryItem.expiry_date.asc())                   .limit(15)
                     
+    suggested_recipes = get_recipes_using_expiring(user_id, expiring_soon)
     
-    
-    return render_template("kitchen.html", active_page="kitchen", expiring_soon=expiring_soon)
-
+    return render_template("kitchen.html", active_page="kitchen", expiring_soon=expiring_soon, suggested_recipes=suggested_recipes)
 
 
 # Pantry functionalities

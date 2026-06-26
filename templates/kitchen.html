@@ -4,6 +4,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pantry.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -11,34 +12,62 @@
 <p>This is the My Kitchen screen.</p>
 
 <h2>Expiring Soon</h2>
-<p>Here are your top 15 pantry items that are expiring next in order of the day they expire:</p>
     {% if expiring_soon %}
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Unit</th>
-                <th>Expiry Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in expiring_soon %}
-            <tr>
-                <td>{{ item.ingredient.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.unit }}</td>
-                <td>{{ item.expiry_date }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <p>Here are your top 15 pantry items that are expiring next in order of the day they expire:</p>
+    <div class="card card-body">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Expiry Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in expiring_soon %}
+                <tr>
+                    <td>{{ item.ingredient.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unit }}</td>
+                    <td>{{ item.expiry_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
+    <div class="card card-body">
         <p>No items are expiring soon.</p>
+    </div>
     {% endif %}
 
-
-
-
+    <h2>Suggested Recipes:</h2>
+    {% if suggested_recipes %}
+    <p>Here are some recipes you can make with the expiring ingredients from above:</p>
+    <div class="dashboard-section">
+        <div class="grid">
+            {% for recipe in suggested_recipes[:4] %}
+                <div class="recipe-plan-wrapper">
+                    <a href="{{ url_for('saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
+                        {% if recipe.image_url %}
+                            <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
+                        {% else %}
+                            <div class="card-no-img">No Image</div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h3 class="card-title">{{ recipe.name }}</h3>
+                            {% if recipe.category or recipe.area %}
+                                <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+        <p>nothing expiring that you can fully make right now</p>
+    {% endif %}
 
 {% endblock %}
