@@ -10,11 +10,14 @@ from pantry_helper import sync_shopping_list, subtract_recipe_ingredients_from_p
 planned_bp = Blueprint("planned", __name__)
 
 
-@planned_bp.route("/planned")
-@login_required
-def planned():
+def get_meal_plans(user_id):
+    """Returns a user's planned meals as [{"plan": MealPlan, "recipe": Recipe}, ...], oldest first.
+
+    Pulled out as its own function since My Kitchen shows a planned meals
+    summary too and needs the same data.
+    """
     # oldest added first
-    meal_plans = MealPlan.query.filter_by(user_id=current_user.id).order_by(MealPlan.id.asc()).all()
+    meal_plans = MealPlan.query.filter_by(user_id=user_id).order_by(MealPlan.id.asc()).all()
 
     # MealPlan doesn't store recipe details itself, so pull each recipe in alongside its plan
     planned_meals = []
@@ -23,6 +26,13 @@ def planned():
         recipe = Recipe.query.get(meal.recipe_id)
         planned_meals.append({"plan": meal, "recipe": recipe})
 
+    return planned_meals
+
+
+@planned_bp.route("/planned")
+@login_required
+def planned():
+    planned_meals = get_meal_plans(current_user.id)
     return render_template("planned.html", active_page="planned", planned_meals=planned_meals)
 
 

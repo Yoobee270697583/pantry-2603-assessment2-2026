@@ -16,17 +16,17 @@
         <form action="{{ url_for('suggestions.suggestions') }}" method="POST">
             <button
                 type="submit"
-                class="btn-create {% if suggested_recipe %}btn-disabled{% endif %}"
-                {% if suggested_recipe %}disabled{% endif %}
-            >Get Suggestion</button>
+                class="btn-create {% if random_suggested_recipe %}btn-disabled{% endif %}"
+                {% if random_suggested_recipe %}disabled{% endif %}
+            >Get Random Recipe Suggestion</button>
         </form>
 
         <!-- grey until a recipe is shown, clears the page when clicked -->
         <form action="{{ url_for('suggestions.suggestions_refresh') }}" method="POST">
             <button
                 type="submit"
-                class="btn-random {% if not suggested_recipe %}btn-disabled{% endif %}"
-                {% if not suggested_recipe %}disabled{% endif %}
+                class="btn-random {% if not random_suggested_recipe %}btn-disabled{% endif %}"
+                {% if not random_suggested_recipe %}disabled{% endif %}
             >↻ Refresh</button>
         </form>
 
@@ -37,30 +37,56 @@
     <p class="search-error">{{ error_message }}</p>
 {% endif %}
 
-{% if suggested_recipe %}
+{% if random_suggested_recipe %}
     <div class="grid">
         <div class="recipe-plan-wrapper">
-            <a href="{{ url_for('recipes.saved_recipe_detail', recipe_id=suggested_recipe.id) }}" class="card">
-                {% if suggested_recipe.image_url %}
-                    <img src="{{ suggested_recipe.image_url }}" alt="{{ suggested_recipe.name }}" class="card-img">
+            <a href="{{ url_for('recipes.saved_recipe_detail', recipe_id=random_suggested_recipe.id) }}" class="card">
+                {% if random_suggested_recipe.image_url %}
+                    <img src="{{ random_suggested_recipe.image_url }}" alt="{{ random_suggested_recipe.name }}" class="card-img">
                 {% else %}
                     <div class="card-no-img">No Image</div>
                 {% endif %}
                 <div class="card-body">
-                    <h3 class="card-title">{{ suggested_recipe.name }}</h3>
-                    {% if suggested_recipe.category or suggested_recipe.area %}
-                        <p class="card-meta">{{ suggested_recipe.category }}{% if suggested_recipe.category and suggested_recipe.area %} · {% endif %}{{ suggested_recipe.area }}</p>
+                    <h3 class="card-title">{{ random_suggested_recipe.name }}</h3>
+                    {% if random_suggested_recipe.category or random_suggested_recipe.area %}
+                        <p class="card-meta">{{ random_suggested_recipe.category }}{% if random_suggested_recipe.category and random_suggested_recipe.area %} · {% endif %}{{ random_suggested_recipe.area }}</p>
                     {% endif %}
                 </div>
             </a>
-            <form action="{{ url_for('planned.add_saved_to_plan', recipe_id=suggested_recipe.id) }}" method="POST">
+            <form action="{{ url_for('planned.add_saved_to_plan', recipe_id=random_suggested_recipe.id) }}" method="POST">
                 <button type="submit" class="btn-submit">Plan this meal</button>
             </form>
         </div>
     </div>
+{% endif %}
 
-{% elif not error_message %}
-    <p class="search-prompt">click get suggestion to find a recipe that matches your pantry</p>
+{% if not random_suggested_recipe %}
+
+    {% if all_suggestable_recipes %}
+        <p class="search-prompt">Here are some recipes you can make with your current pantry items:</p>
+        <div class="grid">
+            {% for recipe in all_suggestable_recipes %}
+                <div class="recipe-plan-wrapper">
+                    <a href="{{ url_for('recipes.saved_recipe_detail', recipe_id=recipe.id) }}" class="card">
+                        {% if recipe.image_url %}
+                            <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img">
+                        {% else %}
+                            <div class="card-no-img">No Image</div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h3 class="card-title">{{ recipe.name }}</h3>
+                            {% if recipe.category or recipe.area %}
+                                <p class="card-meta">{{ recipe.category }}{% if recipe.category and recipe.area %} · {% endif %}{{ recipe.area }}</p>
+                            {% endif %}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="search-prompt">click get suggestion to find a recipe that matches your pantry</p>
+    {% endif %}
+
 {% endif %}
 
 {% endblock %}
