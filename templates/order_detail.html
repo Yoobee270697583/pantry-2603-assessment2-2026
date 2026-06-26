@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} — Pantry{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shopping.css') }}">
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('orders.orders') }}" class="back-link">← back to orders</a>
+
+<h1>Order #{{ order.id }}</h1>
+<p class="card-meta">{{ order.ordered_at.strftime('%d %b %Y, %H:%M') }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Ingredient</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>{{ item.ingredient.name }}</td>
+            <td>{{ "%.2f"|format(item.quantity) }}</td>
+            <td>{{ unit_labels.get(item.unit, item.unit) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

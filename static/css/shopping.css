@@ -38,16 +38,6 @@
     font-weight: 600;
 }
 
-/* ---- orders ---- */
-
-.order-card {
-    margin-bottom: 20px;
-}
-
-.order-card table {
-    margin-top: 12px;
-}
-
 /* ---- manual add panel ---- */
 
 .manual-add-form {
